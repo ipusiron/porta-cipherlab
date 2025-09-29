@@ -1,0 +1,210 @@
+<!DOCTYPE html>
+<html lang="ja">
+<head>
+  <meta charset="UTF-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1.0">
+  <meta http-equiv="Content-Security-Policy" content="default-src 'self'; img-src 'self' https://cryptiana.web.fc2.com data:; style-src 'self' 'unsafe-inline'; script-src 'self'; connect-src 'none'; object-src 'none'; base-uri 'self'; form-action 'none';">
+  <title>Porta CipherLab - ポルタ連字暗号ツール</title>
+  <link rel="stylesheet" href="style.css">
+</head>
+<body>
+  <h1>Porta CipherLab - ポルタ連字暗号ツール</h1>
+  <p class="subtitle">平文2文字を3桁コードに変換する古典的な連字暗号を体験できる教育ツール</p>
+
+  <div class="tabs">
+    <button class="tab-button" data-tab="keygen">置換表生成</button>
+    <button class="tab-button" data-tab="encrypt">暗号化</button>
+    <button class="tab-button" data-tab="decrypt">復号</button>
+    <button class="tab-button" data-tab="comm">通信シミュレーター</button>
+    <button class="tab-button" data-tab="docs">座学</button>
+  </div>
+
+  <div id="keygen" class="tab-content">
+    <h2>置換表生成</h2>
+    <div class="input-group">
+      <label for="matrixSize">マトリクスサイズ:</label>
+      <select id="matrixSize">
+        <option value="26">26×26 (全アルファベット)</option>
+        <option value="20">20×20 (J,K,U,W,X,Z除外)</option>
+      </select>
+      <span class="tooltip">
+        <span class="help-icon">?</span>
+        <span class="tooltip-text">暗号表のサイズを選択します。26×26は全アルファベット対応、20×20は古典的なポルタ暗号の仕様です。</span>
+      </span>
+    </div>
+    <div class="input-group">
+      <label for="seed">シード:</label>
+      <input id="seed" type="text" placeholder="任意の文字列">
+      <span class="tooltip">
+        <span class="help-icon">?</span>
+        <span class="tooltip-text">同じシード値を入力すると、同じ置換表を再生成できます。空欄の場合は完全にランダムな表を生成します。共有や再現性が必要な場合に使用してください。</span>
+      </span>
+    </div>
+    <div class="input-group">
+      <label for="reservedCodes">予約コード:</label>
+      <input id="reservedCodes" type="text" value="000,999" placeholder="カンマ区切り">
+      <span class="tooltip">
+        <span class="help-icon">?</span>
+        <span class="tooltip-text">暗号表で使用しない特別なコード。通信制御や特殊用途のために予約できます。</span>
+      </span>
+    </div>
+    <div class="button-group">
+      <button onclick="generateMatrix()">3桁乱数表を生成</button>
+      <label for="importFile" class="file-input-button">置換表をインポート</label>
+      <input type="file" id="importFile" onchange="importKey(event)" style="display: none;">
+    </div>
+    <h3>検証結果</h3>
+    <pre id="keyStatus"></pre>
+    <h3>マトリクス表示</h3>
+    <div id="matrixDisplay"></div>
+    <div class="export-button-container">
+      <button onclick="exportKey()">置換表をエクスポート</button>
+    </div>
+  </div>
+
+  <div id="encrypt" class="tab-content">
+    <h2>暗号化</h2>
+    <div class="input-with-button">
+      <div class="textarea-container">
+        <textarea id="encryptInputText" rows="5" placeholder="平文を入力"></textarea>
+        <button onclick="clearEncryptText()" class="clear-button">クリア</button>
+      </div>
+    </div>
+    <div class="input-group">
+      <label for="dummyChar">冗字:</label>
+      <input id="dummyChar" type="text" value="X" maxlength="1">
+      <label for="delimiter" style="margin-left: 20px;">区切り:</label>
+      <select id="delimiter">
+        <option value="space">スペース区切り</option>
+        <option value="concat">連結（3桁固定）</option>
+      </select>
+    </div>
+    <h3>文字処理オプション</h3>
+    <div class="input-group">
+      <label for="excludedChars">除外文字の処理:</label>
+      <select id="excludedChars">
+        <option value="keep">そのまま出力</option>
+        <option value="ignore">無視（削除）</option>
+      </select>
+      <span class="help-text">（20×20選択時のJ,K,U,W,X,Z）</span>
+    </div>
+    <div class="input-group">
+      <label for="nonAlpha">非アルファベット:</label>
+      <select id="nonAlpha">
+        <option value="keep">そのまま出力</option>
+        <option value="ignore" selected>無視（削除）</option>
+      </select>
+      <span class="help-text">（記号・スペース・句読点等）</span>
+    </div>
+    <div class="input-group">
+      <label for="numbers">数字:</label>
+      <select id="numbers">
+        <option value="keep">そのまま出力</option>
+        <option value="ignore">無視（削除）</option>
+      </select>
+    </div>
+    <div class="button-group">
+      <button onclick="encryptText()">暗号化</button>
+    </div>
+    <h3>出力</h3>
+    <div class="input-with-button">
+      <div class="textarea-container">
+        <textarea id="encryptOutputText" rows="5" readonly></textarea>
+        <button onclick="copyEncryptOutput()" class="copy-button">コピー</button>
+      </div>
+    </div>
+  </div>
+
+  <div id="decrypt" class="tab-content">
+    <h2>復号</h2>
+    <div class="input-with-button">
+      <div class="textarea-container">
+        <textarea id="decryptInputText" rows="5" placeholder="暗号文を入力"></textarea>
+        <button onclick="clearDecryptText()" class="clear-button">クリア</button>
+      </div>
+    </div>
+    <div class="input-group">
+      <label for="decryptDummyChar">冗字:</label>
+      <input id="decryptDummyChar" type="text" value="X" maxlength="1">
+      <label for="decryptDelimiter" style="margin-left: 20px;">区切り:</label>
+      <select id="decryptDelimiter">
+        <option value="space">スペース区切り</option>
+        <option value="concat">連結（3桁固定）</option>
+      </select>
+    </div>
+    <br>
+    <div class="button-group">
+      <button onclick="decryptText()">復号</button>
+    </div>
+    <h3>出力</h3>
+    <div class="input-with-button">
+      <div class="textarea-container">
+        <textarea id="decryptOutputText" rows="5" readonly></textarea>
+        <button onclick="copyDecryptOutput()" class="copy-button">コピー</button>
+      </div>
+    </div>
+  </div>
+
+  <div id="comm" class="tab-content">
+    <h2>通信シミュレーター</h2>
+    <div class="comm-instruction">
+      <h3>💡 使い方</h3>
+      <p><strong>平文（普通の文章）</strong>を入力してください。暗号文ではありません。</p>
+      <p>「送信＆受信」ボタンで、<strong>送信者の暗号化 → 受信者の復号</strong> の全工程を自動実行します。</p>
+      <p class="example">例：「Hello world」と入力 → 暗号化 → 数字列送信 → 復号 → 結果確認</p>
+    </div>
+    <div class="input-with-button">
+      <div class="textarea-container">
+        <textarea id="commInput" rows="5" placeholder="送信したい平文（例：HELLO WORLD）"></textarea>
+        <button onclick="clearCommInput()" class="clear-button">クリア</button>
+      </div>
+    </div>
+    <div class="button-group">
+      <button onclick="simulateComm()">送信＆受信</button>
+    </div>
+    <h3>通信結果</h3>
+    <div class="comm-result">
+      <div class="result-step">
+        <h4>1. 送信データ（平文）</h4>
+        <pre id="commPlaintext"></pre>
+      </div>
+      <div class="result-step">
+        <h4>2. 暗号化されたデータ</h4>
+        <pre id="commCiphertext"></pre>
+      </div>
+      <div class="result-step">
+        <h4>3. 受信・復号されたデータ</h4>
+        <pre id="commDecrypted"></pre>
+      </div>
+      <div class="result-status" id="commStatus"></div>
+    </div>
+  </div>
+
+  <div id="docs" class="tab-content">
+    <h2>ポルタ連字暗号</h2>
+    <p>ポルタ（Giovanni Battista della Porta, 1543?-1615）が考案した連字暗号は、平文2文字を1記号に変換する多文字式暗号の初期例です。</p>
+    <p>以下は原典の置換表（暗号表）です。20×20マトリクス、各セルに固有の記号が割り当てられています。</p>
+    <img src="https://cryptiana.web.fc2.com/code/porta11.jpg" alt="Porta digraphic cipher table" style="max-width:100%;">
+    <p>ただし、本ツールでは実用上の都合から、各セルに3桁乱数を割り当てて暗号化／復号を行います。</p>
+
+    <div class="security-warning">
+      <h3>⚠️ セキュリティ注意</h3>
+      <p>本ツールは<strong>教育目的専用</strong>です。以下の点にご注意ください：</p>
+      <ul>
+        <li>ポルタ連字暗号は古典暗号であり、現代のセキュリティ標準を満たしていません</li>
+        <li>重要な情報の暗号化には使用しないでください</li>
+        <li>生成された置換表や暗号化されたデータは第三者と共有しないでください</li>
+        <li>ブラウザの開発者ツールで処理内容が見える可能性があります</li>
+      </ul>
+    </div>
+  </div>
+
+  <footer>
+    <div class="footer">
+      🔗 GitHubリポジトリはこちら（ <a href="https://github.com/ipusiron/porta-cipherlab" target="_blank" rel="noopener noreferrer">ipusiron/porta-cipherlab</a> ）
+    </div>
+  </footer>
+
+  <script src="script.js"></script>
+</body>
+</html>
