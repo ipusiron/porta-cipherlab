@@ -1,11 +1,38 @@
 <!--
 ---
-title: Porta CipherLab
-category: classical-cryptography
+id: day080
+slug: porta-cipherlab
+
+title: "Porta CipherLab"
+
+subtitle_ja: "ポルタ連字暗号ツール"
+subtitle_en: "Interactive Digraphic Cipher Tool"
+
+description_ja: "Giovanni Battista della Portaが考案した連字暗号（digraphic cipher）を体験できる教育用ツール。20×20/26×26マトリクスを使用し、平文2文字を3桁コードに変換する暗号化・復号を実装。"
+description_en: "Educational tool to learn Porta's digraphic cipher. Encrypt and decrypt using 20×20 or 26×26 substitution matrices with unique 3-digit codes for each character pair."
+
+category_ja:
+  - 古典暗号
+  - 換字式暗号
+category_en:
+  - Classical Cryptography
+  - Substitution Cipher
+
 difficulty: 2
-description: Interactive web tool to learn Porta’s digraphic cipher (連字暗号). Encrypt and decrypt using 20×20 substitution tables, with 3-digit codes or alternative mappings.
-tags: [porta-cipher, digraphic, classical-crypto, education, visualization, javascript]
-demo: https://ipusiron.github.io/porta-cipherlab/
+
+tags:
+  - porta-cipher
+  - digraphic-cipher
+  - classical-crypto
+  - substitution-matrix
+  - education
+  - visualization
+  - javascript
+
+repo_url: "https://github.com/ipusiron/porta-cipherlab"
+demo_url: "https://ipusiron.github.io/porta-cipherlab/"
+
+hub: true
 ---
 -->
 
@@ -193,8 +220,8 @@ demo: https://ipusiron.github.io/porta-cipherlab/
      ```
 
 5. **CTF/演習問題作成**
-   - 手順: 区切りなし(3桁連結)で暗号文を作成 → ダミー文字を混在 → 問題文として出題。
-   - ヒント設計: 20×20、ダミー=“X”、予約コードの存在などを段階的に開示。
+   - 手順: 区切りなし（3桁連結）で暗号文を作成 → ダミー文字を混在 → 問題文として出題。
+   - ヒント設計: 20×20、ダミー='X'、予約コードの存在などを段階的に開示。
    - 例:
      ```
      平文: MEET AT NOON → パディング後: MEETATNOONX

@@ -20,7 +20,15 @@ Since this is a static site with no build process:
   ```bash
   python -m http.server 8000
   # or
+  npx http-server . --port 4173
+  # or
   start index.html
+  ```
+
+- **Format check** (optional):
+  ```bash
+  npx prettier --check index.html script.js style.css
+  npx prettier --write index.html script.js style.css  # auto-fix
   ```
 
 - **Deploy**: Push to GitHub main branch (GitHub Pages auto-deploys from main)
@@ -29,26 +37,36 @@ Since this is a static site with no build process:
 
 The application consists of three main files:
 
-1. **index.html**: Tab-based UI structure with sections for encryption/decryption, key generation, matrix display, communication simulator, and educational content
+1. **index.html**: Tab-based UI with 5 sections: key generation, encryption, decryption, communication simulator, and educational content (座学)
 2. **script.js**: Core cipher logic including:
-   - 20×20 matrix generation with unique 3-digit codes (000-999)
-   - Encryption: plaintext pairs → 3-digit codes
-   - Decryption: 3-digit codes → plaintext pairs
-   - Key import/export as JSON
-3. **style.css**: Simple styling for the tabbed interface
+   - `SeededRandom` class for reproducible matrix generation via seed strings
+   - `generateMatrix()` creates 20×20 or 26×26 matrices with unique 3-digit codes
+   - `encryptText()` / `decryptText()` for cipher operations
+   - `exportKey()` / `importKey()` for JSON key persistence
+   - `simulateComm()` for end-to-end encryption demo
+3. **style.css**: Responsive styling with CSS variables, flexbox/grid layouts
 
 ## Key Implementation Details
 
-- **Alphabet**: Uses 20 characters (excludes J,K,U,W,X,Z) stored in `const alphabet = "ABCDEFGHILMNOPQRSTVZ"`
-- **Matrix**: 20×20 array mapping character pairs to 3-digit codes
-- **Reserved codes**: Configurable list of codes to exclude (default: "000","999")
+- **Alphabets**: Two modes supported
+  - 20-char (classic): `"ABCDEFGHILMNOPQRSTVZ"` (excludes J,K,U,W,X,Z)
+  - 26-char (extended): Full A-Z alphabet
+- **Matrix**: 20×20 (400 cells) or 26×26 (676 cells) mapping character pairs to 3-digit codes
+- **Reserved codes**: Configurable exclusion list (default: "000", "999")
 - **Dummy character**: Padding for odd-length plaintext (default: "X")
 - **Delimiter options**: Space-separated or concatenated 3-digit sequences
+
+## Code Style
+
+- JavaScript: 2-space indent, `const`/`let`, lowerCamelCase
+- CSS: kebab-case class names, prefer existing flexbox/grid patterns
+- Keep DOM IDs stable; inline event handlers are used throughout
 
 ## Testing Approach
 
 Manual testing in browser - no automated test framework. Test scenarios:
-1. Generate key and verify 400 unique codes
+1. Generate key and verify unique codes (400 for 20×20, 676 for 26×26)
 2. Encrypt/decrypt round-trip verification
 3. Key export/import functionality
-4. Edge cases: odd-length text, invalid characters
+4. Edge cases: odd-length text, invalid characters, excluded character handling
+5. UI testing at narrow (<480px) and desktop widths
