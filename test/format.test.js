@@ -1,13 +1,13 @@
 import test from 'node:test';
 import assert from 'node:assert/strict';
 import fs from 'node:fs';
-import { read } from './load.js';
+import { load, read } from './load.js';
 
-const JS = ['script.js', 'js/porta-core.js', 'js/messages.js',
+const JS = ['script.js', 'js/porta-core.js', 'js/messages.js', 'js/i18n.js',
   ...fs.readdirSync(new URL('./', import.meta.url)).filter((f) => f.endsWith('.js')).map((f) => `test/${f}`)];
 
-// ひらがな・カタカナ・CJK統合漢字・全角形（数値から組み立てる）
-const JP = `${String.fromCodePoint(0x3040)}-${String.fromCodePoint(0x30ff)}${String.fromCodePoint(0x4e00)}-${String.fromCodePoint(0x9fff)}`
+// 和文の句読点・ひらがな・カタカナ・CJK統合漢字・全角形（数値から組み立てる。U+3000 の全角空白は含めない）
+const JP = `${String.fromCodePoint(0x3001)}-${String.fromCodePoint(0x30ff)}${String.fromCodePoint(0x4e00)}-${String.fromCodePoint(0x9fff)}`
   + `${String.fromCodePoint(0xff00)}-${String.fromCodePoint(0xffef)}`;
 const SPACED = new RegExp(`[${JP}] [A-Za-z0-9]|[A-Za-z0-9] [${JP}]`, 'u');
 
@@ -28,7 +28,23 @@ test('画面の文言で、日本語と英数字の間に空白を入れない',
   const html = read('index.html').replace(/<script[\s\S]*?<\/script>/g, '');
   const texts = [...html.replace(/<[^>]+>/g, '\n').split('\n'), ...[...html.matchAll(/(?:aria-label|placeholder|alt|title)="([^"]*)"/g)].map((m) => m[1])];
   for (const s of texts) assert.ok(!SPACED.test(s), s.trim());
-  for (const m of read('js/messages.js').matchAll(/^\s*'[^']+': '(.*)',$/gm)) assert.ok(!SPACED.test(m[1]), m[1]);
+  for (const v of Object.values(load('js/messages.js').PortaMessages.dict.ja)) assert.ok(!SPACED.test(v), v);
+});
+
+test('画面の文言で、ブロックの中の改行が日本語どうしの間に空白を作らない', () => {
+  // ブロック要素の区切りで分け、ブロックの中の空白（改行と字下げ）を1つにまとめてから見る
+  const JP_RE = new RegExp(`[${JP}] [${JP}]`, 'u');
+  const html = read('index.html').replace(/<script[\s\S]*?<\/script>/g, '');
+  const TAGS = ['p', 'li', 'h[1-6]', 'div', 'td', 'th', 'figcaption', 'summary', 'option', 'label', 'button', 'caption', 'section',
+    'ul', 'ol', 'tr', 'table', 'figure', 'details', 'header', 'footer', 'main', 'noscript', 'select', 'textarea'];
+  const BLOCK = new RegExp(`</?(?:${TAGS.join('|')})\\b[^>]*>`, 'g');
+  const SEP = String.fromCodePoint(0x1e);
+  const blocks = html.replace(BLOCK, SEP).replace(/<[^>]+>/g, '').split(SEP);
+  for (const b of blocks) {
+    const text = b.replace(/\s+/g, ' ').trim();
+    assert.ok(!JP_RE.test(text), text);
+    assert.ok(!SPACED.test(text), text);
+  }
 });
 
 test('ファイルは LF で、制御文字を含まない', () => {
