@@ -22,9 +22,10 @@ Porta CipherLab is an educational web tool for Giovanni Battista della Porta's D
 
 1. `index.html`: 5 tabs (置換表 / 暗号化 / 復号 / 通信シミュレーター / 座学), WAI-ARIA tabs, help disclosure buttons. Strict meta CSP (no `'unsafe-inline'`): no inline handlers, no style attributes.
 2. `js/porta-core.js` (`globalThis.PortaCore`, no DOM): alphabets, `normalizeText`, `toPairs`, `encrypt`, `parseCiphertext`, `decrypt`, `simulate`, RNG (`cryptoUint32Source`, `cyrb128` + `seededUint32Source` = sfc32, `randomBelow`), keys (`parseReserved`, `makeKey`, `exportKey`, `importKey`, `displayRows`). Returns message keys `{ key, params }`, never UI text.
-3. `js/messages.js` (`globalThis.PortaMessages`): all UI strings (`t(key, params)`, `tm(msg)`). Japanese only for now; keep keys stable for English.
-4. `script.js`: DOM only (tabs, rendering with `textContent`/`createElement`, events). No Japanese string literals (tested).
-5. `style.css`: color tokens on `:root` (contrast tested), `:focus-visible` outline, 16px inputs, 44px buttons.
+3. `js/messages.js` (`globalThis.PortaMessages`): all UI strings in Japanese and English with the same keys (`t(key, params)`, `tm(msg)`). Static text in `index.html` uses `data-i18n` / `data-i18n-attr`; the Japanese HTML text must equal the `ja` dictionary (tested).
+4. `js/i18n.js` (`globalThis.PortaI18n`): initial language (`?lang=` → saved choice → browser language) and static text replacement. `script.js` keeps a render function per result element (`live`) and redraws everything on language change.
+5. `script.js`: DOM only (tabs, rendering with `textContent`/`createElement`, events). No Japanese string literals (tested).
+6. `style.css`: color tokens on `:root` (contrast tested), `:focus-visible` outline, 16px inputs, 44px buttons.
 
 ## Key Implementation Details
 
@@ -34,6 +35,8 @@ Porta CipherLab is an educational web tool for Giovanni Battista della Porta's D
 - Non-letters are removed and reported with positions (no "keep" option: digits would collide with codes).
 - Key file v2: `{ format: 'porta-cipherlab-key', version: 2, size, alphabet, order, reserved, matrix }`.
 - Known answers in `test/core.test.js` come from an independent Python reference implementation (kept outside this repo).
+
+- Original symbols: `assets/porta1563_symbols.png` (20×20 sprite cut from p. 90 of the 1563 first edition, Public Domain Mark 1.0; column = first letter, row = second letter). Porta's example (p. 91) gives 60 symbols in lines of 15/12/15/13/5. Do not edit the images; their SHA-256 is pinned in `test/symbols.test.js`.
 
 ## Code Style
 

@@ -159,3 +159,59 @@ test('表記: 長音・ひらく語・日本語と英数字の間の空白・強
   // 箇条書きの先頭の項目名を太字にしない
   for (const line of prose) assert.ok(!/^\s*- \*\*/.test(line), line);
 });
+
+// ---- 英語版 README ----
+const readmeEn = read('README.en.md');
+
+test('日英の README は言語のリンクで結ばれ、見出しの数・順・階層が同じ', () => {
+  assert.equal(readmeEn.split('\n')[0], 'English · [日本語](README.md)');
+  assert.match(readme, /\n\[English\]\(README\.en\.md\) · 日本語\n/);
+  const heads = (md) => proseLines(md).filter((l) => /^#{1,3} /.test(l)).map((l) => l.match(/^#+/)[0].length);
+  assert.deepEqual(heads(readmeEn), heads(readme));
+  const h2 = (md) => [...md.matchAll(/^## (\S+)/gm)].map((m) => m[1]);
+  assert.deepEqual(h2(readmeEn), h2(readme));
+  assert.match(readmeEn, /\n\*\*Day080 - 100 Security Tools with Generative AI\*\*\n/);
+  assert.match(readmeEn, /https:\/\/akademeia\.info\/\?page_id=42163/);
+  // YAML メタデータは README.md だけに置く
+  assert.ok(!readmeEn.includes('<!--'));
+});
+
+test('英語版の暗号文の例も計算部で計算し直すと一致する', () => {
+  const rows = [...readmeEn.matchAll(/^\| (26×26|20×20) \| (\w+) \| ([^|]+) \| ([^|]+) \| ([0-9 ]+) \|$/gm)];
+  assert.equal(rows.length, 4);
+  const delimiter = { Spaces: 'space', Joined: 'concat' };
+  const handling = { Replace: 'replace', Remove: 'drop' };
+  for (const [, table, seed, plain, setting, expected] of rows) {
+    const size = table === '20×20' ? 20 : 26;
+    const key = C.makeKey(size, C.DEFAULT_RESERVED, C.seededUint32Source(seed)).key;
+    const r = C.encrypt(key, plain.trim(), {
+      dummy: C.DEFAULT_DUMMY[size],
+      delimiter: delimiter[setting.trim()] || 'space',
+      handling20: handling[setting.trim()] || 'replace',
+    });
+    assert.equal(r.output, expected.trim(), `${table} ${seed} ${plain}`);
+  }
+  assert.ok(readmeEn.includes('becomes IVPITERVVASHERE, which has 15 letters'));
+  assert.ok(readmeEn.includes('Plaintext and ciphertext 10,000 characters, seed 200 characters, reserved codes 300, key file 200,000 bytes'));
+});
+
+test('英語版の画像は assets/en/ の6枚で、すべて実在する', () => {
+  const refs = [...readmeEn.matchAll(/!\[[^\]]*\]\((assets\/en\/[^)]+\.png)\)/g)].map((m) => m[1]);
+  assert.equal(refs.length, 6);
+  for (const r of refs) assert.ok(fs.existsSync(new URL(`../${r}`, import.meta.url)), r);
+  const pngs = fs.readdirSync(new URL('../assets/en/', import.meta.url)).filter((f) => f.endsWith('.png')).map((f) => `assets/en/${f}`);
+  assert.deepEqual(pngs.sort(), refs.slice().sort());
+});
+
+test('英語版のディレクトリー構造は日本語版と同じファイルを並べ、全行に説明がある', () => {
+  const tree = (md) => md.match(/## 📁 [^\n]+\n\n```text\n([\s\S]*?)```/)[1].trim().split('\n').slice(1)
+    .map((l) => l.replace(/\s+# .*$/, ''));
+  assert.deepEqual(tree(readmeEn), tree(readme));
+  const block = readmeEn.match(/## 📁 [^\n]+\n\n```text\n([\s\S]*?)```/)[1];
+  for (const line of block.trim().split('\n').slice(1)) assert.match(line, /\s# \S/, line);
+});
+
+test('英語版に日本語の文字が混じらない（言語のリンクを除く）', () => {
+  const re = new RegExp(`[${JP}]`, 'u');
+  readmeEn.split('\n').slice(1).forEach((line, i) => assert.ok(!re.test(line), `${i + 2}: ${line}`));
+});

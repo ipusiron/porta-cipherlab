@@ -3,7 +3,9 @@
 ## Project Structure & Module Organization
 - `index.html` defines the Porta CipherLab interface: five WAI-ARIA tabs, form controls, help disclosure buttons. Keep IDs stable; `test/html.test.js` checks that every ID used by `script.js` exists.
 - `js/porta-core.js` holds all cipher logic with no DOM access (`globalThis.PortaCore`). Return message keys (`{ key, params }`), not UI text.
-- `js/messages.js` holds every UI string (`globalThis.PortaMessages`). Add new strings here; `script.js` must not contain Japanese literals.
+- `js/messages.js` holds every UI string in Japanese and English with the same keys (`globalThis.PortaMessages`). Add new strings to both; `script.js` must not contain Japanese literals.
+- `js/i18n.js` chooses the language and replaces `data-i18n` / `data-i18n-attr` text. Results on screen must be redrawn on language change (register them with `live` in `script.js`).
+- Headless browsers report English as the browser language; add `?lang=ja` when checking the Japanese screen.
 - `script.js` wires the DOM: event listeners, rendering with `textContent`/`createElement` only (no `innerHTML`).
 - `style.css` keeps color tokens on `:root`; `test/contrast.test.js` checks text/background pairs at 4.5:1.
 - `assets/` stores the original table image (public domain scan) and README screenshots.

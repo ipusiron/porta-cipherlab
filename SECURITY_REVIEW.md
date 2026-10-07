@@ -18,7 +18,7 @@ GitHub Pagesでの公開に支障のある問題はありません。
 | 鍵のファイルの読み込み | JSONとして読めること、表が20×20か26×26であること、文字の並び、全マスが3桁の数で重複がないこと、予約コードが3桁の数でマスと衝突しないこと、200,000バイト以下であることを確かめてから使う | `test/core.test.js`（HTMLを入れたマスを拒否する） |
 | 乱数 | シードが空欄なら`crypto.getRandomValues`と棄却法で表を作る | `test/core.test.js` |
 | リファラー | `<meta name="referrer" content="no-referrer">` | `test/html.test.js` |
-| 保存 | 入力・鍵をブラウザーに保存しない（localStorageなどを使わない） | ソースの確認 |
+| 保存 | 入力・鍵をブラウザーに保存しない。localStorageに保存するのは表示の言語の選択（`porta-cipherlab-lang`）だけで、使えない環境でも動く | ソースの確認 |
 
 ## 残るリスクと注意
 

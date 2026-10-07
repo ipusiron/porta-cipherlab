@@ -5,237 +5,240 @@
   <meta name="viewport" content="width=device-width, initial-scale=1.0">
   <meta http-equiv="Content-Security-Policy" content="default-src 'self'; script-src 'self'; style-src 'self'; img-src 'self' data:; connect-src 'none'; object-src 'none'; base-uri 'none'; form-action 'none'">
   <meta name="referrer" content="no-referrer">
-  <title>Porta CipherLab - ポルタの二文字式暗号ツール</title>
+  <title data-i18n="ui.docTitle">Porta CipherLab - ポルタの二文字式暗号ツール</title>
   <link rel="icon" href="data:,">
   <link rel="stylesheet" href="style.css">
 </head>
 <body>
   <header class="site-header">
-    <h1>Porta CipherLab - ポルタの二文字式暗号ツール</h1>
-    <p class="subtitle">平文を2文字ずつ区切り、表の1マス（3桁の数）に置き換える1563年の暗号を体験できる教育用ツール</p>
+    <div class="lang-bar">
+      <button type="button" id="btnLang" class="lang-button" data-i18n="ui.langButton" data-i18n-attr="aria-label:ui.langLabel" aria-label="英語に切り替える">English</button>
+    </div>
+    <h1 data-i18n="ui.title">Porta CipherLab - ポルタの二文字式暗号ツール</h1>
+    <p class="subtitle" data-i18n="ui.subtitle">平文を2文字ずつ区切り、表の1マス（3桁の数）に置き換える1563年の暗号を体験できる教育用ツール</p>
   </header>
 
   <noscript>
-    <p class="noscript">このツールはJavaScriptで動きます。JavaScriptを有効にしてください。</p>
+    <p class="noscript">このツールはJavaScriptで動きます。JavaScriptを有効にしてください。 / This tool requires JavaScript.</p>
   </noscript>
 
   <main>
-    <div class="tabs" role="tablist" aria-label="機能">
-      <button type="button" class="tab-button" role="tab" id="tab-keygen" aria-controls="keygen" aria-selected="true">置換表</button>
-      <button type="button" class="tab-button" role="tab" id="tab-encrypt" aria-controls="encrypt" aria-selected="false" tabindex="-1">暗号化</button>
-      <button type="button" class="tab-button" role="tab" id="tab-decrypt" aria-controls="decrypt" aria-selected="false" tabindex="-1">復号</button>
-      <button type="button" class="tab-button" role="tab" id="tab-symbols" aria-controls="symbols" aria-selected="false" tabindex="-1">原典の記号</button>
-      <button type="button" class="tab-button" role="tab" id="tab-comm" aria-controls="comm" aria-selected="false" tabindex="-1">通信シミュレーター</button>
-      <button type="button" class="tab-button" role="tab" id="tab-docs" aria-controls="docs" aria-selected="false" tabindex="-1">座学</button>
+    <div class="tabs" role="tablist" aria-label="機能" data-i18n-attr="aria-label:ui.tabsLabel">
+      <button type="button" class="tab-button" role="tab" id="tab-keygen" aria-controls="keygen" aria-selected="true" data-i18n="ui.tabKeygen">置換表</button>
+      <button type="button" class="tab-button" role="tab" id="tab-encrypt" aria-controls="encrypt" aria-selected="false" tabindex="-1" data-i18n="ui.tabEncrypt">暗号化</button>
+      <button type="button" class="tab-button" role="tab" id="tab-decrypt" aria-controls="decrypt" aria-selected="false" tabindex="-1" data-i18n="ui.tabDecrypt">復号</button>
+      <button type="button" class="tab-button" role="tab" id="tab-symbols" aria-controls="symbols" aria-selected="false" tabindex="-1" data-i18n="ui.tabSymbols">原典の記号</button>
+      <button type="button" class="tab-button" role="tab" id="tab-comm" aria-controls="comm" aria-selected="false" tabindex="-1" data-i18n="ui.tabComm">通信シミュレーター</button>
+      <button type="button" class="tab-button" role="tab" id="tab-docs" aria-controls="docs" aria-selected="false" tabindex="-1" data-i18n="ui.tabDocs">座学</button>
     </div>
 
     <section id="keygen" class="tab-content" role="tabpanel" aria-labelledby="tab-keygen" tabindex="0">
-      <h2>置換表（鍵）を作る</h2>
+      <h2 data-i18n="ui.keygenTitle">置換表（鍵）を作る</h2>
       <div class="input-group">
-        <label for="matrixSize">表の大きさ</label>
+        <label for="matrixSize" data-i18n="ui.sizeLabel">表の大きさ</label>
         <select id="matrixSize">
-          <option value="26">26×26（A〜Zのすべて）</option>
-          <option value="20">20×20（原典の20文字。J・K・U・W・X・Yなし）</option>
+          <option value="26" data-i18n="ui.size26">26×26（A〜Zのすべて）</option>
+          <option value="20" data-i18n="ui.size20">20×20（原典の20文字。J・K・U・W・X・Yなし）</option>
         </select>
         <button type="button" class="help-button" aria-expanded="false" aria-controls="help-size" aria-label="説明を表示">?</button>
       </div>
-      <p id="help-size" class="help-text" hidden>原典（1563年）の表はA B C D E F G H I L M N O P Q R S T V Zの20文字で、20×20＝400マスです。26×26はすべての英字を使える拡張版です。</p>
+      <p id="help-size" class="help-text" hidden data-i18n="ui.helpSize">原典（1563年）の表はA B C D E F G H I L M N O P Q R S T V Zの20文字で、20×20＝400マスです。26×26はすべての英字を使える拡張版です。</p>
       <div class="input-group">
-        <label for="seed">シード</label>
-        <input id="seed" type="text" placeholder="空欄なら暗号用の乱数で作る" autocomplete="off" spellcheck="false">
+        <label for="seed" data-i18n="ui.seedLabel">シード</label>
+        <input id="seed" type="text" placeholder="空欄なら暗号用の乱数で作る" data-i18n-attr="placeholder:ui.seedPlaceholder" autocomplete="off" spellcheck="false">
         <button type="button" class="help-button" aria-expanded="false" aria-controls="help-seed" aria-label="説明を表示">?</button>
       </div>
-      <p id="help-seed" class="help-text" hidden>同じシードを入れると同じ表を作り直せます（擬似乱数で作るので、表の推測しにくさはシードの推測しにくさで決まります）。空欄にすると暗号用の乱数（crypto.getRandomValues）で作ります。</p>
+      <p id="help-seed" class="help-text" hidden data-i18n="ui.helpSeed">同じシードを入れると同じ表を作り直せます（擬似乱数で作るので、表の推測しにくさはシードの推測しにくさで決まります）。空欄にすると暗号用の乱数（crypto.getRandomValues）で作ります。</p>
       <div class="input-group">
-        <label for="reservedCodes">予約コード</label>
-        <input id="reservedCodes" type="text" value="000,999" placeholder="例: 000,999" autocomplete="off" spellcheck="false">
+        <label for="reservedCodes" data-i18n="ui.reservedLabel">予約コード</label>
+        <input id="reservedCodes" type="text" value="000,999" placeholder="例: 000,999" data-i18n-attr="placeholder:ui.reservedPlaceholder" autocomplete="off" spellcheck="false">
         <button type="button" class="help-button" aria-expanded="false" aria-controls="help-reserved" aria-label="説明を表示">?</button>
       </div>
-      <p id="help-reserved" class="help-text" hidden>表のマスに使わない3桁の数です（カンマか空白で区切る）。通信の合図などに取っておく使い方を想定しています。</p>
+      <p id="help-reserved" class="help-text" hidden data-i18n="ui.helpReserved">表のマスに使わない3桁の数です（カンマか空白で区切る）。通信の合図などに取っておく使い方を想定しています。</p>
       <div class="button-group">
-        <button type="button" id="btnGenerate">表を作る</button>
-        <button type="button" id="btnImport" class="secondary">鍵を読み込む</button>
-        <button type="button" id="btnExport" class="secondary" disabled>鍵を書き出す</button>
+        <button type="button" id="btnGenerate" data-i18n="ui.generate">表を作る</button>
+        <button type="button" id="btnImport" class="secondary" data-i18n="ui.import">鍵を読み込む</button>
+        <button type="button" id="btnExport" class="secondary" disabled data-i18n="ui.export">鍵を書き出す</button>
         <input type="file" id="importFile" accept=".json,application/json" hidden>
       </div>
       <p id="keyStatus" class="status" role="status" aria-live="polite"></p>
       <div id="keyInfo" class="key-info"></div>
 
-      <h3>表で引いてみる</h3>
+      <h3 data-i18n="ui.lookupTitle">表で引いてみる</h3>
       <div class="input-group">
-        <label for="lookupPair">2文字</label>
-        <input id="lookupPair" type="text" maxlength="2" placeholder="例: HE" autocomplete="off" spellcheck="false">
+        <label for="lookupPair" data-i18n="ui.lookupLabel">2文字</label>
+        <input id="lookupPair" type="text" maxlength="2" placeholder="例: HE" data-i18n-attr="placeholder:ui.lookupPlaceholder" autocomplete="off" spellcheck="false">
       </div>
       <p id="lookupResult" class="lookup-result" aria-live="polite"></p>
 
-      <h3>置換表</h3>
+      <h3 data-i18n="ui.matrixTitle">置換表</h3>
       <p id="matrixCaption" class="matrix-caption"></p>
-      <div id="matrixDisplay" class="matrix-wrap" tabindex="0" aria-label="置換表"></div>
+      <div id="matrixDisplay" class="matrix-wrap" tabindex="0" aria-label="置換表" data-i18n-attr="aria-label:ui.matrixTitle"></div>
     </section>
 
     <section id="encrypt" class="tab-content" role="tabpanel" aria-labelledby="tab-encrypt" tabindex="0" hidden>
-      <h2>暗号化</h2>
-      <label for="encryptInputText" class="field-label">平文</label>
+      <h2 data-i18n="ui.encryptTitle">暗号化</h2>
+      <label for="encryptInputText" class="field-label" data-i18n="ui.plaintext">平文</label>
       <div class="textarea-container">
-        <textarea id="encryptInputText" rows="5" placeholder="平文を入力（例: Hello world.）"></textarea>
-        <button type="button" id="btnClearEncrypt" class="clear-button">クリア</button>
+        <textarea id="encryptInputText" rows="5" placeholder="平文を入力（例: Hello world.）" data-i18n-attr="placeholder:ui.encryptPlaceholder"></textarea>
+        <button type="button" id="btnClearEncrypt" class="clear-button" data-i18n="ui.clear">クリア</button>
       </div>
       <div class="input-group">
-        <label for="dummyChar">冗字</label>
+        <label for="dummyChar" data-i18n="ui.dummyLabel">冗字</label>
         <input id="dummyChar" type="text" value="X" maxlength="1" autocomplete="off" spellcheck="false">
         <button type="button" class="help-button" aria-expanded="false" aria-controls="help-dummy" aria-label="説明を表示">?</button>
       </div>
-      <p id="help-dummy" class="help-text" hidden>英字が奇数個のとき、最後の組を作るために足す文字です。表にある文字から選びます（既定: 26×26はX、20×20はZ）。</p>
+      <p id="help-dummy" class="help-text" hidden data-i18n="ui.helpDummy">英字が奇数個のとき、最後の組を作るために足す文字です。表にある文字から選びます（既定: 26×26はX、20×20はZ）。</p>
       <div class="input-group">
-        <label for="delimiter">区切り</label>
+        <label for="delimiter" data-i18n="ui.delimiterLabel">区切り</label>
         <select id="delimiter">
-          <option value="space">空白で区切る</option>
-          <option value="concat">連結（3桁ずつ）</option>
+          <option value="space" data-i18n="ui.delimSpace">空白で区切る</option>
+          <option value="concat" data-i18n="ui.delimConcat">連結（3桁ずつ）</option>
         </select>
       </div>
       <div class="input-group">
-        <label for="excludedChars">表にない英字</label>
+        <label for="excludedChars" data-i18n="ui.excludedLabel">表にない英字</label>
         <select id="excludedChars">
-          <option value="replace">置き換える（J→I・U→V・W→VV）</option>
-          <option value="drop">外す</option>
+          <option value="replace" data-i18n="ui.handleReplace">置き換える（J→I・U→V・W→VV）</option>
+          <option value="drop" data-i18n="ui.handleDrop">外す</option>
         </select>
         <button type="button" class="help-button" aria-expanded="false" aria-controls="help-excluded" aria-label="説明を表示">?</button>
       </div>
-      <p id="help-excluded" class="help-text" hidden>20×20の表だけで使います。当時はIとJ、UとVを同じ文字として扱っていたので置き換えます。K・X・Yは表にないので外します。英字以外（空白・記号・数字）は暗号化から外し、下に一覧で示します。</p>
+      <p id="help-excluded" class="help-text" hidden data-i18n="ui.helpExcluded">20×20の表だけで使います。当時はIとJ、UとVを同じ文字として扱っていたので置き換えます。K・X・Yは表にないので外します。英字以外（空白・記号・数字）は暗号化から外し、下に一覧で示します。</p>
       <div class="button-group">
-        <button type="button" id="btnEncrypt">暗号化</button>
+        <button type="button" id="btnEncrypt" data-i18n="ui.encryptButton">暗号化</button>
       </div>
       <div id="encryptMessages" class="messages" role="status" aria-live="polite"></div>
-      <label for="encryptOutputText" class="field-label">暗号文</label>
+      <label for="encryptOutputText" class="field-label" data-i18n="ui.ciphertext">暗号文</label>
       <div class="textarea-container">
         <textarea id="encryptOutputText" rows="5" readonly></textarea>
-        <button type="button" id="btnCopyEncrypt" class="copy-button">コピー</button>
+        <button type="button" id="btnCopyEncrypt" class="copy-button" data-i18n="ui.copy">コピー</button>
       </div>
       <div id="encryptPairs" class="pairs"></div>
     </section>
 
     <section id="decrypt" class="tab-content" role="tabpanel" aria-labelledby="tab-decrypt" tabindex="0" hidden>
-      <h2>復号</h2>
-      <label for="decryptInputText" class="field-label">暗号文（3桁の数）</label>
+      <h2 data-i18n="ui.decryptTitle">復号</h2>
+      <label for="decryptInputText" class="field-label" data-i18n="ui.ciphertextCodes">暗号文（3桁の数）</label>
       <div class="textarea-container">
-        <textarea id="decryptInputText" rows="5" placeholder="暗号文を入力（例: 583 950 564 161 096）"></textarea>
-        <button type="button" id="btnClearDecrypt" class="clear-button">クリア</button>
+        <textarea id="decryptInputText" rows="5" placeholder="暗号文を入力（例: 583 950 564 161 096）" data-i18n-attr="placeholder:ui.decryptPlaceholder"></textarea>
+        <button type="button" id="btnClearDecrypt" class="clear-button" data-i18n="ui.clear">クリア</button>
       </div>
       <div class="input-group">
-        <label for="decryptDummyChar">冗字</label>
+        <label for="decryptDummyChar" data-i18n="ui.dummyLabel">冗字</label>
         <input id="decryptDummyChar" type="text" value="X" maxlength="1" autocomplete="off" spellcheck="false">
       </div>
       <div class="input-group">
-        <label for="decryptDelimiter">区切り</label>
+        <label for="decryptDelimiter" data-i18n="ui.delimiterLabel">区切り</label>
         <select id="decryptDelimiter">
-          <option value="space">空白で区切る</option>
-          <option value="concat">連結（3桁ずつ）</option>
+          <option value="space" data-i18n="ui.delimSpace">空白で区切る</option>
+          <option value="concat" data-i18n="ui.delimConcat">連結（3桁ずつ）</option>
         </select>
       </div>
       <div class="input-group checkbox-group">
         <input id="stripDummy" type="checkbox" checked>
-        <label for="stripDummy">末尾の冗字を外す</label>
+        <label for="stripDummy" data-i18n="ui.stripDummy">末尾の冗字を外す</label>
       </div>
       <div class="button-group">
-        <button type="button" id="btnDecrypt">復号</button>
+        <button type="button" id="btnDecrypt" data-i18n="ui.decryptButton">復号</button>
       </div>
       <div id="decryptMessages" class="messages" role="status" aria-live="polite"></div>
-      <label for="decryptOutputText" class="field-label">平文（英字）</label>
+      <label for="decryptOutputText" class="field-label" data-i18n="ui.plaintextLetters">平文（英字）</label>
       <div class="textarea-container">
         <textarea id="decryptOutputText" rows="5" readonly></textarea>
-        <button type="button" id="btnCopyDecrypt" class="copy-button">コピー</button>
+        <button type="button" id="btnCopyDecrypt" class="copy-button" data-i18n="ui.copy">コピー</button>
       </div>
       <div id="decryptPairs" class="pairs"></div>
     </section>
 
     <section id="symbols" class="tab-content" role="tabpanel" aria-labelledby="tab-symbols" tabindex="0" hidden>
-      <h2>原典の記号で暗号化・復号</h2>
-      <p>1563年初版p.90の表（リヨン市立図書館所蔵本のスキャン、Public Domain Mark 1.0）から切り出した400個の記号を使います。</p>
-      <p>表は原典の20文字（J・K・U・W・X・Yなし）に固定で、上の見出しが1文字目、右の見出しが2文字目です。</p>
+      <h2 data-i18n="ui.symTitle">原典の記号で暗号化・復号</h2>
+      <p data-i18n="ui.symIntro1">1563年初版p.90の表（リヨン市立図書館所蔵本のスキャン、Public Domain Mark 1.0）から切り出した400個の記号を使います。</p>
+      <p data-i18n="ui.symIntro2">表は原典の20文字（J・K・U・W・X・Yなし）に固定で、上の見出しが1文字目、右の見出しが2文字目です。</p>
 
-      <h3>平文を記号にする</h3>
-      <label for="symInput" class="field-label">平文</label>
+      <h3 data-i18n="ui.symEncTitle">平文を記号にする</h3>
+      <label for="symInput" class="field-label" data-i18n="ui.plaintext">平文</label>
       <div class="textarea-container">
-        <textarea id="symInput" rows="4" placeholder="平文を入力（例: Attack at dawn）"></textarea>
-        <button type="button" id="btnSymClear" class="clear-button">クリア</button>
+        <textarea id="symInput" rows="4" placeholder="平文を入力（例: Attack at dawn）" data-i18n-attr="placeholder:ui.symPlaceholder"></textarea>
+        <button type="button" id="btnSymClear" class="clear-button" data-i18n="ui.clear">クリア</button>
       </div>
       <div class="input-group">
-        <label for="symDummy">冗字</label>
+        <label for="symDummy" data-i18n="ui.dummyLabel">冗字</label>
         <input id="symDummy" type="text" value="Z" maxlength="1" autocomplete="off" spellcheck="false">
       </div>
       <div class="input-group">
-        <label for="symHandling">表にない英字</label>
+        <label for="symHandling" data-i18n="ui.excludedLabel">表にない英字</label>
         <select id="symHandling">
-          <option value="replace">置き換える（J→I・U→V・W→VV）</option>
-          <option value="drop">外す</option>
+          <option value="replace" data-i18n="ui.handleReplace">置き換える（J→I・U→V・W→VV）</option>
+          <option value="drop" data-i18n="ui.handleDrop">外す</option>
         </select>
       </div>
       <div class="input-group checkbox-group">
         <input id="symShowPairs" type="checkbox" checked>
-        <label for="symShowPairs">記号の下に組の文字を出す</label>
+        <label for="symShowPairs" data-i18n="ui.symShowPairs">記号の下に組の文字を出す</label>
       </div>
       <div class="button-group">
-        <button type="button" id="btnSymEncrypt">記号にする</button>
-        <button type="button" id="btnSymExample" class="secondary">ポルタの例文を入れる</button>
-        <button type="button" id="btnSymSave" class="secondary" disabled>PNGで保存</button>
+        <button type="button" id="btnSymEncrypt" data-i18n="ui.symEncrypt">記号にする</button>
+        <button type="button" id="btnSymExample" class="secondary" data-i18n="ui.symExample">ポルタの例文を入れる</button>
+        <button type="button" id="btnSymSave" class="secondary" disabled data-i18n="ui.symSave">PNGで保存</button>
       </div>
       <div id="symMessages" class="messages" role="status" aria-live="polite"></div>
       <div id="symOutput" class="sym-output"></div>
 
-      <h3>記号を選んで読む</h3>
-      <p>原典と同じ並びの表です。暗号文の記号と同じものを順に押すと、英字に戻します。原典は、探しやすいように似た記号を同じ列に集めています。表の中は矢印キーでも動けます。</p>
+      <h3 data-i18n="ui.symPickTitle">記号を選んで読む</h3>
+      <p data-i18n="ui.symPickIntro">原典と同じ並びの表です。暗号文の記号と同じものを順に押すと、英字に戻します。原典は、探しやすいように似た記号を同じ列に集めています。表の中は矢印キーでも動けます。</p>
       <p id="symDecoded" class="lookup-result" aria-live="polite"></p>
       <div id="symSelected" class="sym-output sym-small"></div>
       <div class="input-group checkbox-group">
         <input id="symStrip" type="checkbox">
-        <label for="symStrip">末尾の冗字を外す</label>
+        <label for="symStrip" data-i18n="ui.stripDummy">末尾の冗字を外す</label>
       </div>
       <div class="button-group">
-        <button type="button" id="btnSymUndo" class="secondary">1つ戻す</button>
-        <button type="button" id="btnSymReset" class="secondary">選んだ記号を消す</button>
+        <button type="button" id="btnSymUndo" class="secondary" data-i18n="ui.symUndo">1つ戻す</button>
+        <button type="button" id="btnSymReset" class="secondary" data-i18n="ui.symReset">選んだ記号を消す</button>
       </div>
       <div id="symPickerWrap" class="matrix-wrap sym-picker-wrap"></div>
 
-      <h3>原典の暗号文を読んでみる</h3>
+      <h3 data-i18n="ui.symReadTitle">原典の暗号文を読んでみる</h3>
       <figure class="docs-figure wide">
-        <img src="assets/porta1563_example.jpg" alt="ポルタの例文の暗号文。飾り枠の中に記号が5行に並んでいる" width="900" height="478">
-        <figcaption>1563年初版p.91に刷られたポルタの例文の暗号文（記号60個、5行）。リヨン市立図書館所蔵本のスキャン（Public Domain Mark 1.0）。</figcaption>
+        <img src="assets/porta1563_example.jpg" alt="ポルタの例文の暗号文。飾り枠の中に記号が5行に並んでいる" data-i18n-attr="alt:ui.symExampleAlt" width="900" height="478">
+        <figcaption data-i18n="ui.symExampleCaption">1563年初版p.91に刷られたポルタの例文の暗号文（記号60個、5行）。リヨン市立図書館所蔵本のスキャン（Public Domain Mark 1.0）。</figcaption>
       </figure>
-      <p>上の表から記号を順に選ぶと読めます。最初の記号は、Mの列とVの行が交わるマスにあります。</p>
+      <p data-i18n="ui.symReadIntro">上の表から記号を順に選ぶと読めます。最初の記号は、Mの列とVの行が交わるマスにあります。</p>
       <details class="answer">
-        <summary>答え: このツールで同じ例文を記号にした列</summary>
+        <summary data-i18n="ui.symAnswerSummary">答え: このツールで同じ例文を記号にした列</summary>
         <div id="symAnswer" class="sym-output"></div>
-        <p>刷られた暗号文と1つずつ見比べると、60個すべてが同じ順に並びます。逆に引いた表（1文字目を横の見出し）では、最初の記号から食い違います。</p>
+        <p data-i18n="ui.symAnswerNote">刷られた暗号文と1つずつ見比べると、60個すべてが同じ順に並びます。逆に引いた表（1文字目を横の見出し）では、最初の記号から食い違います。</p>
       </details>
     </section>
 
     <section id="comm" class="tab-content" role="tabpanel" aria-labelledby="tab-comm" tabindex="0" hidden>
-      <h2>通信シミュレーター</h2>
+      <h2 data-i18n="ui.commTitle">通信シミュレーター</h2>
       <div class="comm-instruction">
-        <h3>💡 使い方</h3>
-        <p><strong>平文（ふつうの文章）</strong>を入れてください。暗号文ではありません。</p>
-        <p>「送信＆受信」を押すと、いまの表で<strong>送る側の暗号化 → 数字の列の送信 → 受ける側の復号</strong>を通しで行います。冗字は表の既定（26×26はX、20×20はZ）、20×20の表にない英字は置き換えます。</p>
+        <h3 data-i18n="ui.commHowTitle">💡 使い方</h3>
+        <p><strong data-i18n="ui.commHow1a">平文（ふつうの文章）</strong><span data-i18n="ui.commHow1b">を入れてください。暗号文ではありません。</span></p>
+        <p><span data-i18n="ui.commHow2a">「送信＆受信」を押すと、いまの表で</span><strong data-i18n="ui.commHow2b">送る側の暗号化 → 数字の列の送信 → 受ける側の復号</strong><span data-i18n="ui.commHow2c">を通しで行います。冗字は表の既定（26×26はX、20×20はZ）、20×20の表にない英字は置き換えます。</span></p>
       </div>
-      <label for="commInput" class="field-label">送りたい平文</label>
+      <label for="commInput" class="field-label" data-i18n="ui.commInputLabel">送りたい平文</label>
       <div class="textarea-container">
-        <textarea id="commInput" rows="5" placeholder="例: Attack at dawn!"></textarea>
-        <button type="button" id="btnClearComm" class="clear-button">クリア</button>
+        <textarea id="commInput" rows="5" placeholder="例: Attack at dawn!" data-i18n-attr="placeholder:ui.commPlaceholder"></textarea>
+        <button type="button" id="btnClearComm" class="clear-button" data-i18n="ui.clear">クリア</button>
       </div>
       <div class="button-group">
-        <button type="button" id="btnSimulate">送信＆受信</button>
+        <button type="button" id="btnSimulate" data-i18n="ui.simulate">送信＆受信</button>
       </div>
-      <h3>通信結果</h3>
+      <h3 data-i18n="ui.commResultTitle">通信結果</h3>
       <div class="comm-result">
         <div class="result-step">
-          <h4>1. 送る平文</h4>
+          <h4 data-i18n="ui.commStep1">1. 送る平文</h4>
           <pre id="commPlaintext"></pre>
         </div>
         <div class="result-step">
-          <h4>2. 暗号化して送るデータ</h4>
+          <h4 data-i18n="ui.commStep2">2. 暗号化して送るデータ</h4>
           <pre id="commCiphertext"></pre>
         </div>
         <div class="result-step">
-          <h4>3. 受け取って復号したデータ</h4>
+          <h4 data-i18n="ui.commStep3">3. 受け取って復号したデータ</h4>
           <pre id="commDecrypted"></pre>
         </div>
         <div class="result-status" id="commStatus" role="status" aria-live="polite"></div>
@@ -243,38 +246,43 @@
     </section>
 
     <section id="docs" class="tab-content" role="tabpanel" aria-labelledby="tab-docs" tabindex="0" hidden>
-      <h2>ポルタの二文字式暗号</h2>
-      <p>ナポリの学者ジョヴァンニ・バッティスタ・デッラ・ポルタ（Giovanni Battista della Porta、1535年ごろ〜1615年）は、1563年に刊行した暗号書『De Furtivis Literarum Notis』の第2巻第13章で、平文の2文字を記号1つに置き換える表を示しました。</p>
+      <h2 data-i18n="ui.docsTitle">ポルタの二文字式暗号</h2>
+      <p data-i18n="ui.docsIntro">ナポリの学者ジョヴァンニ・バッティスタ・デッラ・ポルタ（Giovanni Battista della Porta、1535年ごろ〜1615年）は、1563年に刊行した暗号書『De Furtivis Literarum Notis』の第2巻第13章で、平文の2文字を記号1つに置き換える表を示しました。</p>
       <figure class="docs-figure">
-        <img src="assets/porta1563_table.jpg" alt="ポルタの二文字式暗号の表。上と右に20文字のアルファベットが並び、400のマスに記号が1つずつ入っている" width="900" height="1115">
-        <figcaption>原典の表（20×20＝400マス、1563年初版p.90）。上の見出しが1文字目、右の見出しが2文字目です。リヨン市立図書館所蔵本のスキャン（Public Domain Mark 1.0）。</figcaption>
+        <img src="assets/porta1563_table.jpg" alt="ポルタの二文字式暗号の表。上と右に20文字のアルファベットが並び、400のマスに記号が1つずつ入っている" data-i18n-attr="alt:ui.docsTableAlt" width="900" height="1115">
+        <figcaption data-i18n="ui.docsTableCaption">原典の表（20×20＝400マス、1563年初版p.90）。上の見出しが1文字目、右の見出しが2文字目です。リヨン市立図書館所蔵本のスキャン（Public Domain Mark 1.0）。</figcaption>
       </figure>
 
-      <h3>表の作り方と引き方</h3>
-      <p>原典は、正方形の両辺を20等分して400のマスを作り、各マスに記号を1つずつ入れ、上辺と側面にアルファベットを並べると書いています。引き方は「1文字目の下にあり、2文字目と横から出会うマスの記号を取る」です。つまり上の見出しが1文字目、横の見出しが2文字目です。相手に知らせておけば逆に引いてもよい、とも書いています。</p>
-      <p>受け取った側は、曲尺（L字の定規）の角を記号に当てて上と横の文字を読みます。原典は、探しやすいように似た記号を同じ並びに置いたと述べています。</p>
-      <p>暗号史家のデイヴィッド・カーン（David Kahn）は『The Codebreakers』で、これを暗号学で最初の二文字式暗号と書いています。文字どうしを置き換える二文字式としては、19世紀のプレイフェア暗号が最初です。</p>
-      <p>本ツールの表も原典と同じ向きで、上の見出しが1文字目、左の見出しが2文字目です。記号の代わりに、各マスへ重複のない3桁の数を入れます。</p>
-      <p>「原典の記号」タブでは、この表から切り出した記号そのもので暗号化できます。p.91に刷られたポルタの例文の暗号文も、この表で読むと例文に戻ります。</p>
+      <h3 data-i18n="ui.docsRuleTitle">表の作り方と引き方</h3>
+      <p data-i18n="ui.docsRule1">原典は、正方形の両辺を20等分して400のマスを作り、各マスに記号を1つずつ入れ、上辺と側面にアルファベットを並べると書いています。引き方は「1文字目の下にあり、2文字目と横から出会うマスの記号を取る」です。つまり上の見出しが1文字目、横の見出しが2文字目です。相手に知らせておけば逆に引いてもよい、とも書いています。</p>
+      <p data-i18n="ui.docsRule2">受け取った側は、曲尺（L字の定規）の角を記号に当てて上と横の文字を読みます。原典は、探しやすいように似た記号を同じ並びに置いたと述べています。</p>
+      <p data-i18n="ui.docsKahn">暗号史家のデイヴィッド・カーン（David Kahn）は『The Codebreakers』で、これを暗号学で最初の二文字式暗号と書いています。文字どうしを置き換える二文字式としては、19世紀のプレイフェア暗号が最初です。</p>
+      <p data-i18n="ui.docsThisTool">本ツールの表も原典と同じ向きで、上の見出しが1文字目、左の見出しが2文字目です。記号の代わりに、各マスへ重複のない3桁の数を入れます。</p>
+      <p data-i18n="ui.docsSymbols">「原典の記号」タブでは、この表から切り出した記号そのもので暗号化できます。p.91に刷られたポルタの例文の暗号文も、この表で読むと例文に戻ります。</p>
 
-      <h3>20文字のアルファベット</h3>
-      <p>原典の表の文字はA B C D E F G H I L M N O P Q R S T V Zの20文字で、J・K・U・W・X・Yはありません。原典の例文もUをVで書いています（VNIVERSA、CIVITAS）。本ツールの20×20の表では、J→I、U→V、W→VVに置き換え、K・X・Yは外して一覧に示します（「外す」を選ぶとJ・U・Wも外します）。</p>
+      <h3 data-i18n="ui.docsAlphaTitle">20文字のアルファベット</h3>
+      <p data-i18n="ui.docsAlpha">原典の表の文字はA B C D E F G H I L M N O P Q R S T V Zの20文字で、J・K・U・W・X・Yはありません。原典の例文もUをVで書いています（VNIVERSA、CIVITAS）。本ツールの20×20の表では、J→I、U→V、W→VVに置き換え、K・X・Yは外して一覧に示します（「外す」を選ぶとJ・U・Wも外します）。</p>
 
-      <h3>ポルタ自身の例文</h3>
+      <h3 data-i18n="ui.docsExampleTitle">ポルタ自身の例文</h3>
       <p class="latin" lang="la">MVLTIS CLADIBVS VLTRO CITROQVE DATIS ET ACCEPTIS, VNIVERSA PENE CIVITAS OCCVPATA EST, RELIQVA NON SCRIBAM, SED IN CONGRESSVM NOSTRVM RESERVABO.</p>
-      <p>試訳: 双方で多くの損害を与え、また受けたのち、町はほぼ全体が占領された。残りは書かず、会ったときのために取っておく。</p>
-      <p>英字は120個（60組）で、すべて20文字の表にあります。</p>
+      <p data-i18n="ui.docsExampleTranslation">試訳: 双方で多くの損害を与え、また受けたのち、町はほぼ全体が占領された。残りは書かず、会ったときのために取っておく。</p>
+      <p data-i18n="ui.docsExampleCount">英字は120個（60組）で、すべて20文字の表にあります。</p>
       <div class="button-group">
-        <button type="button" id="btnUseExample" class="secondary">この例文を暗号化タブに入れる</button>
+        <button type="button" id="btnUseExample" class="secondary" data-i18n="ui.useExample">この例文を暗号化タブに入れる</button>
       </div>
 
-      <h3>同じ記号は本当に「まれ」か</h3>
-      <p>原典は、2文字を1つの記号にするので、同じ記号が文中に2度出ることはまれだと述べています。しかし例文の120字の中でも、ISの組は3回、QV・ED・AT・ER・ST・REは2回ずつ出ます。英語の小説（ディケンズ『二都物語』）から切り出して数えると、次のとおりです。</p>
+      <h3 data-i18n="ui.docsRareTitle">同じ記号は本当に「まれ」か</h3>
+      <p data-i18n="ui.docsRare">原典は、2文字を1つの記号にするので、同じ記号が文中に2度出ることはまれだと述べています。しかし例文の120字の中でも、ISの組は3回、QV・ED・AT・ER・ST・REは2回ずつ出ます。英語の小説（ディケンズ『二都物語』）から切り出して数えると、次のとおりです。</p>
       <div class="table-wrap">
         <table class="data-table">
-          <caption>2文字ずつ区切ったとき、2回以上出る組が占める割合（200か所の平均）</caption>
+          <caption data-i18n="ui.docsRareCaption">2文字ずつ区切ったとき、2回以上出る組が占める割合（200か所の平均）</caption>
           <thead>
-            <tr><th scope="col">英字の数</th><th scope="col">組の数</th><th scope="col">2回以上出る組の割合</th><th scope="col">最多の組の回数</th></tr>
+            <tr>
+              <th scope="col" data-i18n="ui.docsRareColLetters">英字の数</th>
+              <th scope="col" data-i18n="ui.docsRareColPairs">組の数</th>
+              <th scope="col" data-i18n="ui.docsRareColShare">2回以上出る組の割合</th>
+              <th scope="col" data-i18n="ui.docsRareColTop">最多の組の回数</th>
+            </tr>
           </thead>
           <tbody>
             <tr><td>100</td><td>50</td><td>29.4%</td><td>3.1</td></tr>
@@ -283,48 +291,49 @@
           </tbody>
         </table>
       </div>
-      <p>英語ではTH・HE・ERなどの組が多く出ます。この偏りは、二文字式の暗号を解く手がかりになります（二文字の頻度分析）。「通信シミュレーター」で長めの文を送ると、同じ数が何度も出るのを確かめられます。</p>
+      <p data-i18n="ui.docsRareAfter">英語ではTH・HE・ERなどの組が多く出ます。この偏りは、二文字式の暗号を解く手がかりになります（二文字の頻度分析）。「通信シミュレーター」で長めの文を送ると、同じ数が何度も出るのを確かめられます。</p>
 
-      <h3>本ツールの表（鍵）と乱数</h3>
+      <h3 data-i18n="ui.docsKeyTitle">本ツールの表（鍵）と乱数</h3>
       <ul>
-        <li>シードを入れたときは擬似乱数（cyrb128＋sfc32）で表を作る。同じシードから同じ表を作り直せるが、表の推測しにくさはシードの推測しにくさで決まる</li>
-        <li>シードが空欄のときは暗号用の乱数（crypto.getRandomValues）で作る。20×20の表の並べ方は約2の3850乗通りある</li>
-        <li>鍵はJSONで書き出し・読み込みできる（matrix[1文字目][2文字目]の形）</li>
+        <li data-i18n="ui.docsKey1">シードを入れたときは擬似乱数（cyrb128＋sfc32）で表を作る。同じシードから同じ表を作り直せるが、表の推測しにくさはシードの推測しにくさで決まる</li>
+        <li data-i18n="ui.docsKey2">シードが空欄のときは暗号用の乱数（crypto.getRandomValues）で作る。20×20の表の並べ方は約2の3850乗通りある</li>
+        <li data-i18n="ui.docsKey3">鍵はJSONで書き出し・読み込みできる（matrix[1文字目][2文字目]の形）</li>
       </ul>
 
-      <h3>関連ツール</h3>
+      <h3 data-i18n="ui.docsRelatedTitle">関連ツール</h3>
       <ul>
-        <li><a href="https://ipusiron.github.io/playfair-cipherlab/" target="_blank" rel="noopener noreferrer">Playfair CipherLab</a>（Day027）: 5×5の表から規則で2文字を2文字に換える二文字式の暗号</li>
-        <li><a href="https://ipusiron.github.io/hill-cipherlab/" target="_blank" rel="noopener noreferrer">Hill CipherLab</a>（Day093）: 行列の計算で複数の文字をまとめて換える暗号</li>
-        <li><a href="https://ipusiron.github.io/polybius-cipherlab/" target="_blank" rel="noopener noreferrer">Polybius CipherLab</a>（Day067）: 1文字を2つの数字に換える方陣</li>
-        <li><a href="https://ipusiron.github.io/classical-cipher-structure-trainer/" target="_blank" rel="noopener noreferrer">Classical Cipher Structure Trainer</a>（Day097）: 換字と転置の構造を学ぶ</li>
+        <li><a href="https://ipusiron.github.io/playfair-cipherlab/" target="_blank" rel="noopener noreferrer">Playfair CipherLab</a><span data-i18n="ui.relPlayfair">（Day027）: 5×5の表から規則で2文字を2文字に換える二文字式の暗号</span></li>
+        <li><a href="https://ipusiron.github.io/hill-cipherlab/" target="_blank" rel="noopener noreferrer">Hill CipherLab</a><span data-i18n="ui.relHill">（Day093）: 行列の計算で複数の文字をまとめて換える暗号</span></li>
+        <li><a href="https://ipusiron.github.io/polybius-cipherlab/" target="_blank" rel="noopener noreferrer">Polybius CipherLab</a><span data-i18n="ui.relPolybius">（Day067）: 1文字を2つの数字に換える方陣</span></li>
+        <li><a href="https://ipusiron.github.io/classical-cipher-structure-trainer/" target="_blank" rel="noopener noreferrer">Classical Cipher Structure Trainer</a><span data-i18n="ui.relStructure">（Day097）: 換字と転置の構造を学ぶ</span></li>
       </ul>
 
-      <h3>出典</h3>
+      <h3 data-i18n="ui.docsSourcesTitle">出典</h3>
       <ul class="sources">
-        <li>G. B. della Porta, <cite>De Furtivis Literarum Notis</cite>, Naples, 1563, Liber II, cap. XIII（<a href="https://archive.org/details/bub_gb_sc-Zaq8_jFIC" target="_blank" rel="noopener noreferrer">Internet Archive</a>）</li>
+        <li>G. B. della Porta, <cite>De Furtivis Literarum Notis</cite>, Naples, 1563, Liber II, cap. XIII (<a href="https://archive.org/details/bub_gb_sc-Zaq8_jFIC" target="_blank" rel="noopener noreferrer">Internet Archive</a>)</li>
       </ul>
 
       <div class="security-warning">
-        <h3>⚠️ セキュリティの注意</h3>
-        <p>本ツールは<strong>教育目的</strong>のツールです。次の点に注意してください。</p>
+        <h3 data-i18n="ui.secTitle">⚠️ セキュリティの注意</h3>
+        <p><span data-i18n="ui.secLeadA">本ツールは</span><strong data-i18n="ui.secLeadB">教育目的</strong><span data-i18n="ui.secLeadC">のツールです。次の点に注意してください。</span></p>
         <ul>
-          <li>ポルタの二文字式暗号は古典暗号で、現代の安全性の基準を満たしません</li>
-          <li>重要な情報の暗号化には使わないでください</li>
-          <li>暗号化・復号・表の生成はブラウザーの中だけで行い、外部へは送信しません</li>
+          <li data-i18n="ui.sec1">ポルタの二文字式暗号は古典暗号で、現代の安全性の基準を満たしません</li>
+          <li data-i18n="ui.sec2">重要な情報の暗号化には使わないでください</li>
+          <li data-i18n="ui.sec3">暗号化・復号・表の生成はブラウザーの中だけで行い、外部へは送信しません</li>
         </ul>
       </div>
     </section>
   </main>
 
   <footer class="footer">
-    🔗 GitHubリポジトリーはこちら（<a href="https://github.com/ipusiron/porta-cipherlab" target="_blank" rel="noopener noreferrer">ipusiron/porta-cipherlab</a>）
+    <span data-i18n="ui.footerLead">🔗 GitHubリポジトリー:</span> <a href="https://github.com/ipusiron/porta-cipherlab" target="_blank" rel="noopener noreferrer">ipusiron/porta-cipherlab</a>
   </footer>
 
   <div id="toast" class="toast" role="status" aria-live="polite"></div>
 
   <script src="js/porta-core.js" defer></script>
   <script src="js/messages.js" defer></script>
+  <script src="js/i18n.js" defer></script>
   <script src="script.js" defer></script>
 </body>
 </html>

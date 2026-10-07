@@ -1,9 +1,9 @@
 import test from 'node:test';
 import assert from 'node:assert/strict';
 import fs from 'node:fs';
-import { read } from './load.js';
+import { load, read } from './load.js';
 
-const JS = ['script.js', 'js/porta-core.js', 'js/messages.js',
+const JS = ['script.js', 'js/porta-core.js', 'js/messages.js', 'js/i18n.js',
   ...fs.readdirSync(new URL('./', import.meta.url)).filter((f) => f.endsWith('.js')).map((f) => `test/${f}`)];
 
 // 和文の句読点・ひらがな・カタカナ・CJK統合漢字・全角形（数値から組み立てる。U+3000 の全角空白は含めない）
@@ -28,7 +28,7 @@ test('画面の文言で、日本語と英数字の間に空白を入れない',
   const html = read('index.html').replace(/<script[\s\S]*?<\/script>/g, '');
   const texts = [...html.replace(/<[^>]+>/g, '\n').split('\n'), ...[...html.matchAll(/(?:aria-label|placeholder|alt|title)="([^"]*)"/g)].map((m) => m[1])];
   for (const s of texts) assert.ok(!SPACED.test(s), s.trim());
-  for (const m of read('js/messages.js').matchAll(/^\s*'[^']+': '(.*)',$/gm)) assert.ok(!SPACED.test(m[1]), m[1]);
+  for (const v of Object.values(load('js/messages.js').PortaMessages.dict.ja)) assert.ok(!SPACED.test(v), v);
 });
 
 test('画面の文言で、ブロックの中の改行が日本語どうしの間に空白を作らない', () => {

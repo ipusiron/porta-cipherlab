@@ -31,7 +31,7 @@ test('インラインのイベントハンドラー・style 属性・インラ�
   assert.ok(!/\sstyle\s*=/i.test(html), 'style 属性がない');
   assert.ok(!/<style[\s>]/i.test(html), 'style 要素がない');
   const scripts = [...html.matchAll(/<script([^>]*)>([\s\S]*?)<\/script>/g)];
-  assert.deepEqual(scripts.map((m) => (m[1].match(/src="([^"]+)"/) || [])[1]), ['js/porta-core.js', 'js/messages.js', 'script.js']);
+  assert.deepEqual(scripts.map((m) => (m[1].match(/src="([^"]+)"/) || [])[1]), ['js/porta-core.js', 'js/messages.js', 'js/i18n.js', 'script.js']);
   for (const m of scripts) {
     assert.equal(m[2].trim(), '', 'script の中身は空');
     assert.match(m[1], /\sdefer/);
@@ -78,7 +78,7 @@ test('? ボタンは button で、開閉する説明の要素を指す', () => {
     assert.match(b, /type="button"/);
     assert.match(b, /aria-expanded="false"/);
     const target = b.match(/aria-controls="([^"]+)"/)[1];
-    assert.match(html, new RegExp(`<p id="${target}" class="help-text" hidden>`));
+    assert.match(html, new RegExp(`<p id="${target}" class="help-text" hidden[ >]`));
   }
 });
 
@@ -91,7 +91,7 @@ test('すべての button に type があり、入力欄にラベルがある', 
 });
 
 test('画面の処理は innerHTML・eval・document.write を使わない', () => {
-  for (const f of ['script.js', 'js/porta-core.js', 'js/messages.js']) {
+  for (const f of ['script.js', 'js/porta-core.js', 'js/messages.js', 'js/i18n.js']) {
     const src = read(f);
     assert.ok(!/\.innerHTML\s*=|insertAdjacentHTML|outerHTML\s*=/.test(src), f);
     assert.ok(!/\beval\(|new Function\(|document\.write/.test(src), f);

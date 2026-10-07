@@ -5,8 +5,24 @@
 
   const C = window.PortaCore;
   const M = window.PortaMessages;
+  const I = window.PortaI18n;
   const { t, tm } = M;
   const $ = (id) => document.getElementById(id);
+
+  // 初期の言語（?lang= → 保存した選択 → ブラウザーの言語）
+  M.setLanguage(I.initialLanguage(window.location.search, I.readSaved(), navigator.languages));
+  I.applyStaticText(document);
+
+  // 言語を切り替えたときに描き直すため、要素ごとに最後の描き方を覚えておく
+  const liveRenders = new Map();
+  function live(el, render) {
+    if (render) {
+      liveRenders.set(el, render);
+      render();
+    } else {
+      liveRenders.delete(el);
+    }
+  }
 
   // いまの鍵（null か { size, alphabet, reserved, matrix }）と、その出所の説明
   const state = { key: null, source: null };
@@ -42,7 +58,9 @@
   selectTab(tabs[0], false);
 
   // ---- 説明の開閉（? ボタン） ----
-  for (const btn of document.querySelectorAll('.help-button')) {
+  const helpButtons = Array.from(document.querySelectorAll('.help-button'));
+  for (const btn of helpButtons) btn.setAttribute('aria-label', t('help.show'));
+  for (const btn of helpButtons) {
     btn.addEventListener('click', () => {
       const panel = $(btn.getAttribute('aria-controls'));
       const open = btn.getAttribute('aria-expanded') !== 'true';
@@ -53,22 +71,30 @@
   }
 
   // ---- 表示の小道具 ----
+  // 状態の文。text は文か、文を返す関数（言語を切り替えたら描き直す）
   function setStatus(el, text, kind) {
-    el.textContent = text;
-    el.classList.remove('success', 'error', 'warning');
-    if (text && kind) el.classList.add(kind);
+    const textOf = typeof text === 'function' ? text : () => text;
+    live(el, () => {
+      const value = textOf() || '';
+      el.textContent = value;
+      el.classList.remove('success', 'error', 'warning');
+      if (value && kind) el.classList.add(kind);
+    });
   }
 
-  // メッセージ欄に段落を並べる。items は [{ text, kind }]
+  // メッセージ欄に段落を並べる。items は [{ text, kind }] か、それを返す関数
   function showMessages(el, items) {
-    el.replaceChildren();
-    for (const item of items) {
-      if (!item.text) continue;
-      const p = document.createElement('p');
-      p.className = `message ${item.kind || ''}`.trim();
-      p.textContent = item.text;
-      el.appendChild(p);
-    }
+    const itemsOf = typeof items === 'function' ? items : () => items;
+    live(el, () => {
+      el.replaceChildren();
+      for (const item of itemsOf()) {
+        if (!item.text) continue;
+        const p = document.createElement('p');
+        p.className = `message ${item.kind || ''}`.trim();
+        p.textContent = item.text;
+        el.appendChild(p);
+      }
+    });
   }
 
   let toastTimer = null;
@@ -130,12 +156,21 @@
   }
   const replacedItem = (r) => t('item.replaced', { pos: r.pos, char: r.char, to: r.to });
 
-  // 組と数の対応を小さな札で並べる
+  // 組と数の対応を小さな札で並べる。title は見出しを返す関数、rows は行の配列か、それを返す関数
   function showPairs(el, title, rows) {
+    const rowsOf = typeof rows === 'function' ? rows : () => rows;
+    if (rowsOf().length === 0) {
+      live(el, null);
+      el.replaceChildren();
+      return;
+    }
+    live(el, () => renderPairs(el, title, rowsOf()));
+  }
+
+  function renderPairs(el, title, rows) {
     el.replaceChildren();
-    if (rows.length === 0) return;
     const h = document.createElement('h3');
-    h.textContent = title;
+    h.textContent = title();
     const ol = document.createElement('ol');
     ol.className = 'pair-list';
     for (const [a, b] of rows) {
@@ -299,8 +334,9 @@
     }
     out.textContent = t('lookup.result', { first, second, code });
     const cell = highlight(first, second);
-    // 表の枠の中だけを横に動かして、そのマスを見せる（ページ全体は動かさない）
-    if (cell) {
+    // 表の枠の中だけを横に動かして、そのマスを見せる（ページ全体は動かさない）。
+    // タブが隠れているあいだは寸法を測れない（offsetParent が null）ので動かさない
+    if (cell && cell.offsetParent) {
       const wrap = $('matrixDisplay');
       const x = cell.offsetLeft + cell.offsetParent.offsetLeft;
       wrap.scrollLeft = Math.max(0, x - (wrap.clientWidth - cell.offsetWidth) / 2);
@@ -314,23 +350,23 @@
     const seed = $('seed').value.trim();
     const seedLength = Array.from(seed).length;
     if (seedLength > C.LIMITS.seedChars) {
-      setStatus(status, t('error.seedTooLong', { length: seedLength, max: C.LIMITS.seedChars }), 'error');
+      setStatus(status, () => t('error.seedTooLong', { length: seedLength, max: C.LIMITS.seedChars }), 'error');
       return;
     }
     const reserved = C.parseReserved($('reservedCodes').value);
     if (!reserved.ok) {
-      setStatus(status, tm(reserved.error), 'error');
+      setStatus(status, () => tm(reserved.error), 'error');
       return;
     }
     const next = seed ? C.seededUint32Source(seed) : C.cryptoUint32Source(window.crypto);
     const made = C.makeKey(size, reserved.codes, next);
     if (!made.ok) {
-      setStatus(status, tm(made.error), 'error');
+      setStatus(status, () => tm(made.error), 'error');
       return;
     }
     const source = seed ? { type: 'seed', seed } : { type: 'random' };
     setKey(made.key, source);
-    setStatus(status, t('status.generated', { size, cells: size * size, source: sourceText(source) }), 'success');
+    setStatus(status, () => t('status.generated', { size, cells: size * size, source: sourceText(source) }), 'success');
   });
 
   sizeSelect.addEventListener('change', updateKeyInfo);
@@ -342,7 +378,7 @@
     const status = $('keyStatus');
     if (!file) return;
     if (file.size > C.LIMITS.keyFileBytes) {
-      setStatus(status, t('error.keyTooLarge', { max: C.LIMITS.keyFileBytes }), 'error');
+      setStatus(status, () => t('error.keyTooLarge', { max: C.LIMITS.keyFileBytes }), 'error');
       input.value = '';
       return;
     }
@@ -351,16 +387,16 @@
       const r = C.importKey(String(reader.result));
       input.value = '';
       if (!r.ok) {
-        setStatus(status, tm(r.error), 'error');
+        setStatus(status, () => tm(r.error), 'error');
         return;
       }
       sizeSelect.value = String(r.key.size);
       setKey(r.key, { type: 'import', name: file.name });
-      setStatus(status, t('status.imported', { size: r.key.size, name: file.name }), 'success');
+      setStatus(status, () => t('status.imported', { size: r.key.size, name: file.name }), 'success');
     };
     reader.onerror = () => {
       input.value = '';
-      setStatus(status, t('error.fileRead'), 'error');
+      setStatus(status, () => t('error.fileRead'), 'error');
     };
     reader.readAsText(file);
   });
@@ -377,8 +413,18 @@
     a.click();
     a.remove();
     setTimeout(() => URL.revokeObjectURL(url), 1000);
-    setStatus($('keyStatus'), t('status.exported', { name }), 'success');
+    setStatus($('keyStatus'), () => t('status.exported', { name }), 'success');
   });
+
+  // 暗号化・原典の記号の結果の文（要約・冗字・置き換え・外した文字・警告）
+  function resultMessages(r, summary) {
+    const msgs = [{ text: summary, kind: 'success' }];
+    if (r.padded) msgs.push({ text: t('enc.padded', { dummy: r.dummy }) });
+    if (r.replaced.length) msgs.push({ text: t('enc.replaced', { count: r.replaced.length, list: listText(r.replaced, replacedItem) }) });
+    if (r.dropped.length) msgs.push({ text: t('enc.dropped', { count: r.dropped.length, list: droppedText(r.dropped) }) });
+    for (const w of r.warnings) msgs.push({ text: tm(w), kind: 'warning' });
+    return msgs;
+  }
 
   // ---- 暗号化 ----
   function clearEncryptResult() {
@@ -394,20 +440,13 @@
       delimiter: $('delimiter').value,
       handling20: $('excludedChars').value,
     });
-    const msgs = [];
     if (!r.ok) {
-      msgs.push({ text: tm(r.error), kind: 'error' });
-      showMessages($('encryptMessages'), msgs);
+      showMessages($('encryptMessages'), () => [{ text: tm(r.error), kind: 'error' }]);
       return;
     }
     $('encryptOutputText').value = r.output;
-    msgs.push({ text: t('enc.summary', { letters: r.letters.length, pairs: r.pairs.length }), kind: 'success' });
-    if (r.padded) msgs.push({ text: t('enc.padded', { dummy: r.dummy }) });
-    if (r.replaced.length) msgs.push({ text: t('enc.replaced', { count: r.replaced.length, list: listText(r.replaced, replacedItem) }) });
-    if (r.dropped.length) msgs.push({ text: t('enc.dropped', { count: r.dropped.length, list: droppedText(r.dropped) }) });
-    for (const w of r.warnings) msgs.push({ text: tm(w), kind: 'warning' });
-    showMessages($('encryptMessages'), msgs);
-    showPairs($('encryptPairs'), t('enc.pairsTitle'), r.pairs.map((p, i) => [p, r.codes[i]]));
+    showMessages($('encryptMessages'), () => resultMessages(r, t('enc.summary', { letters: r.letters.length, pairs: r.pairs.length })));
+    showPairs($('encryptPairs'), () => t('enc.pairsTitle'), r.pairs.map((p, i) => [p, r.codes[i]]));
   });
 
   $('btnClearEncrypt').addEventListener('click', () => {
@@ -435,14 +474,17 @@
       stripDummy: $('stripDummy').checked,
     });
     if (!r.ok) {
-      showMessages($('decryptMessages'), [{ text: tm(r.error), kind: 'error' }]);
+      showMessages($('decryptMessages'), () => [{ text: tm(r.error), kind: 'error' }]);
       return;
     }
     $('decryptOutputText').value = r.output;
-    const msgs = [{ text: t('dec.summary', { codes: r.items.length, letters: r.output.replace(/\?/g, '').length }), kind: 'success' }];
-    for (const w of r.warnings) msgs.push({ text: tm(w), kind: 'warning' });
-    showMessages($('decryptMessages'), msgs);
-    showPairs($('decryptPairs'), t('dec.pairsTitle'), r.items.map((it) => [it.code, it.pair || (it.reserved ? `?? ${t('warn.reservedCode')}` : '??')]));
+    showMessages($('decryptMessages'), () => {
+      const msgs = [{ text: t('dec.summary', { codes: r.items.length, letters: r.output.replace(/\?/g, '').length }), kind: 'success' }];
+      for (const w of r.warnings) msgs.push({ text: tm(w), kind: 'warning' });
+      return msgs;
+    });
+    showPairs($('decryptPairs'), () => t('dec.pairsTitle'),
+      () => r.items.map((it) => [it.code, it.pair || (it.reserved ? `?? ${t('warn.reservedCode')}` : '??')]));
   });
 
   $('btnClearDecrypt').addEventListener('click', () => {
@@ -456,28 +498,13 @@
 
   // ---- 通信シミュレーター ----
   function clearCommResult() {
+    live($('commPlaintext'), null);
     for (const id of ['commPlaintext', 'commCiphertext', 'commDecrypted']) $(id).textContent = '';
     setStatus($('commStatus'), '', null);
   }
 
-  $('btnSimulate').addEventListener('click', () => {
-    clearCommResult();
-    const status = $('commStatus');
-    const text = $('commInput').value;
-    if (!text.trim()) {
-      setStatus(status, t('comm.noInput'), 'warning');
-      return;
-    }
-    if (!state.key) {
-      setStatus(status, t('error.noKey'), 'error');
-      return;
-    }
-    const dummy = C.DEFAULT_DUMMY[state.key.size];
-    const r = C.simulate(state.key, text, { dummy, handling20: 'replace' });
-    if (!r.ok) {
-      setStatus(status, tm(r.error), 'error');
-      return;
-    }
+  // 通信の3つの段階の文を書く（言語を切り替えたら描き直す）
+  function renderComm(r, text) {
     const { enc, dec } = r;
     const step1 = [t('comm.step1', { text, letters: enc.letters })];
     if (enc.replaced.length) step1.push(t('comm.step1Replaced', { list: listText(enc.replaced, replacedItem) }));
@@ -497,16 +524,37 @@
     if (dec.strippedDummy) step3.push(t('comm.step3Stripped', { dummy: dec.dummy, letters: dec.output }));
     step3.push(t('comm.step3Result', { letters: dec.output }));
     $('commDecrypted').textContent = step3.join('\n');
+  }
 
+  $('btnSimulate').addEventListener('click', () => {
+    clearCommResult();
+    const status = $('commStatus');
+    const text = $('commInput').value;
+    if (!text.trim()) {
+      setStatus(status, () => t('comm.noInput'), 'warning');
+      return;
+    }
+    if (!state.key) {
+      setStatus(status, () => t('error.noKey'), 'error');
+      return;
+    }
+    const dummy = C.DEFAULT_DUMMY[state.key.size];
+    const r = C.simulate(state.key, text, { dummy, handling20: 'replace' });
+    if (!r.ok) {
+      setStatus(status, () => tm(r.error), 'error');
+      return;
+    }
+    const { enc } = r;
+    live($('commPlaintext'), () => renderComm(r, text));
     if (r.match) {
-      const lines = [t('comm.success')];
-      if (enc.replaced.length) lines.push(t('comm.noteReplaced', { count: enc.replaced.length }));
-      if (enc.dropped.length) lines.push(t('comm.noteLost', { count: enc.dropped.length }));
-      setStatus(status, lines.join(''), 'success');
+      setStatus(status, () => {
+        const lines = [t('comm.success')];
+        if (enc.replaced.length) lines.push(t('comm.noteReplaced', { count: enc.replaced.length }));
+        if (enc.dropped.length) lines.push(t('comm.noteLost', { count: enc.dropped.length }));
+        return lines.join('');
+      }, 'success');
     } else {
-      const lines = [t('comm.mismatch', { expected: r.expected, received: r.received })];
-      for (const w of enc.warnings) lines.push(tm(w));
-      setStatus(status, lines.join(' '), 'warning');
+      setStatus(status, () => [t('comm.mismatch', { expected: r.expected, received: r.received }), ...enc.warnings.map(tm)].join(' '), 'warning');
     }
   });
 
@@ -557,26 +605,26 @@
 
   function clearSymResult() {
     symState.cells = [];
+    live($('symOutput'), null);
     $('symOutput').replaceChildren();
     showMessages($('symMessages'), []);
     $('btnSymSave').disabled = true;
+  }
+
+  function renderSymOutput() {
+    live($('symOutput'), () => renderSymbols($('symOutput'), symState.cells, $('symShowPairs').checked));
   }
 
   $('btnSymEncrypt').addEventListener('click', () => {
     clearSymResult();
     const r = C.encryptSymbols($('symInput').value, { dummy: $('symDummy').value, handling20: $('symHandling').value });
     if (!r.ok) {
-      showMessages($('symMessages'), [{ text: tm(r.error), kind: 'error' }]);
+      showMessages($('symMessages'), () => [{ text: tm(r.error), kind: 'error' }]);
       return;
     }
     symState.cells = r.cells;
-    renderSymbols($('symOutput'), r.cells, $('symShowPairs').checked);
-    const msgs = [{ text: t('sym.summary', { letters: r.letters.length, count: r.cells.length }), kind: 'success' }];
-    if (r.padded) msgs.push({ text: t('enc.padded', { dummy: r.dummy }) });
-    if (r.replaced.length) msgs.push({ text: t('enc.replaced', { count: r.replaced.length, list: listText(r.replaced, replacedItem) }) });
-    if (r.dropped.length) msgs.push({ text: t('enc.dropped', { count: r.dropped.length, list: droppedText(r.dropped) }) });
-    for (const w of r.warnings) msgs.push({ text: tm(w), kind: 'warning' });
-    showMessages($('symMessages'), msgs);
+    renderSymOutput();
+    showMessages($('symMessages'), () => resultMessages(r, t('sym.summary', { letters: r.letters.length, count: r.cells.length })));
     $('btnSymSave').disabled = false;
   });
 
@@ -590,7 +638,7 @@
   });
   for (const id of ['symInput', 'symDummy', 'symHandling']) $(id).addEventListener('input', clearSymResult);
   $('symShowPairs').addEventListener('change', () => {
-    if (symState.cells.length) renderSymbols($('symOutput'), symState.cells, $('symShowPairs').checked);
+    if (symState.cells.length) renderSymOutput();
   });
 
   // PNG で保存（1行15個、組の文字は表示の設定に合わせる）
@@ -648,13 +696,14 @@
       setTimeout(() => URL.revokeObjectURL(url), 1000);
       showToast(t('sym.saved', { name }));
     } catch (e) {
-      showMessages($('symMessages'), [{ text: t('sym.saveFailed'), kind: 'warning' }]);
+      showMessages($('symMessages'), () => [{ text: t('sym.saveFailed'), kind: 'warning' }]);
     }
   });
 
   // 記号を選ぶ表（原典と同じ並び: 上の見出し＝1文字目、右の見出し＝2文字目）。矢印キーで動く（ロービング tabindex）
   const pickerButtons = [];
   function buildPicker() {
+    pickerButtons.length = 0;
     const table = document.createElement('table');
     table.className = 'sym-picker';
     const cap = document.createElement('caption');
@@ -772,6 +821,22 @@
     clearEncryptResult();
     selectTab($('tab-encrypt'), true);
   });
+
+  // ---- 言語の切り替え ----
+  function applyLanguage(lang) {
+    M.setLanguage(lang);
+    I.save(lang);
+    I.applyStaticText(document);
+    for (const btn of helpButtons) btn.setAttribute('aria-label', t(btn.getAttribute('aria-expanded') === 'true' ? 'help.hide' : 'help.show'));
+    updateKeyInfo();
+    renderMatrix();
+    updateLookup();
+    buildPicker();
+    updateDecoded();
+    renderAnswer();
+    for (const render of liveRenders.values()) render();
+  }
+  $('btnLang').addEventListener('click', () => applyLanguage(M.getLanguage() === 'ja' ? 'en' : 'ja'));
 
   // ---- 初期表示 ----
   updateKeyInfo();
