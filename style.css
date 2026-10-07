@@ -276,6 +276,7 @@ button.secondary:hover:not(:disabled) {
   align-items: flex-start;
   gap: 12px;
   max-width: 720px;
+  margin-bottom: 14px;
 }
 
 .textarea-container textarea {
@@ -341,7 +342,6 @@ button.secondary:hover:not(:disabled) {
 }
 
 .lookup-result {
-  font-family: 'Courier New', monospace;
   font-weight: 600;
   min-height: 1.6em;
 }
@@ -590,6 +590,50 @@ button.secondary:hover:not(:disabled) {
   font-size: 14px;
 }
 
+/* 座学の表・例文・出典 */
+.table-wrap {
+  overflow-x: auto;
+  max-width: 100%;
+}
+
+.data-table {
+  border-collapse: collapse;
+  margin: 8px 0;
+  width: 100%;
+  max-width: 640px;
+}
+
+.data-table caption {
+  text-align: left;
+  color: var(--text-light);
+  font-size: 14px;
+  padding-bottom: 6px;
+}
+
+.data-table th,
+.data-table td {
+  border: 1px solid var(--border-color);
+  padding: 6px 10px;
+  text-align: right;
+}
+
+.data-table th {
+  background: var(--bg-light);
+  text-align: center;
+}
+
+.latin {
+  font-family: 'Times New Roman', serif;
+  background: var(--bg-light);
+  border-left: 4px solid var(--border-color);
+  padding: 10px 14px;
+  overflow-wrap: anywhere;
+}
+
+.sources {
+  overflow-wrap: anywhere;
+}
+
 /* セキュリティの注意 */
 .security-warning {
   background: var(--error-bg);
@@ -647,13 +691,19 @@ button.secondary:hover:not(:disabled) {
     padding: 16px;
   }
 
+  .data-table th,
+  .data-table td {
+    padding: 6px;
+  }
+
   .input-group label {
     min-width: 0;
     flex: 1 0 100%;
   }
 
   input#seed,
-  input#reservedCodes {
+  input#reservedCodes,
+  .input-group select {
     width: auto;
     flex: 1 1 0;
     min-width: 0;

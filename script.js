@@ -503,6 +503,15 @@
   });
   $('commInput').addEventListener('input', clearCommResult);
 
+  // ---- 座学: ポルタの例文を暗号化タブへ ----
+  const PORTA_EXAMPLE = 'MVLTIS CLADIBVS VLTRO CITROQVE DATIS ET ACCEPTIS, VNIVERSA PENE CIVITAS OCCVPATA EST, '
+    + 'RELIQVA NON SCRIBAM, SED IN CONGRESSVM NOSTRVM RESERVABO.';
+  $('btnUseExample').addEventListener('click', () => {
+    $('encryptInputText').value = PORTA_EXAMPLE;
+    clearEncryptResult();
+    selectTab($('tab-encrypt'), true);
+  });
+
   // ---- 初期表示 ----
   updateKeyInfo();
   updateExcludedOption();

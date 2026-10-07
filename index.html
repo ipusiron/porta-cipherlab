@@ -16,7 +16,7 @@
   </header>
 
   <noscript>
-    <p class="noscript">このツールは JavaScript で動きます。JavaScript を有効にしてください。</p>
+    <p class="noscript">このツールはJavaScriptで動きます。JavaScriptを有効にしてください。</p>
   </noscript>
 
   <main>
@@ -33,12 +33,12 @@
       <div class="input-group">
         <label for="matrixSize">表の大きさ</label>
         <select id="matrixSize">
-          <option value="26">26×26（A〜Z のすべて）</option>
-          <option value="20">20×20（原典の20文字。J・K・U・W・X・Y なし）</option>
+          <option value="26">26×26（A〜Zのすべて）</option>
+          <option value="20">20×20（原典の20文字。J・K・U・W・X・Yなし）</option>
         </select>
         <button type="button" class="help-button" aria-expanded="false" aria-controls="help-size" aria-label="説明を表示">?</button>
       </div>
-      <p id="help-size" class="help-text" hidden>原典（1563年）の表は A B C D E F G H I L M N O P Q R S T V Z の20文字で、20×20＝400マスです。26×26 はすべての英字を使える拡張版です。</p>
+      <p id="help-size" class="help-text" hidden>原典（1563年）の表はA B C D E F G H I L M N O P Q R S T V Zの20文字で、20×20＝400マスです。26×26はすべての英字を使える拡張版です。</p>
       <div class="input-group">
         <label for="seed">シード</label>
         <input id="seed" type="text" placeholder="空欄なら暗号用の乱数で作る" autocomplete="off" spellcheck="false">
@@ -84,7 +84,7 @@
         <input id="dummyChar" type="text" value="X" maxlength="1" autocomplete="off" spellcheck="false">
         <button type="button" class="help-button" aria-expanded="false" aria-controls="help-dummy" aria-label="説明を表示">?</button>
       </div>
-      <p id="help-dummy" class="help-text" hidden>英字が奇数個のとき、最後の組を作るために足す文字です。表にある文字から選びます（既定: 26×26 は X、20×20 は Z）。</p>
+      <p id="help-dummy" class="help-text" hidden>英字が奇数個のとき、最後の組を作るために足す文字です。表にある文字から選びます（既定: 26×26はX、20×20はZ）。</p>
       <div class="input-group">
         <label for="delimiter">区切り</label>
         <select id="delimiter">
@@ -100,7 +100,7 @@
         </select>
         <button type="button" class="help-button" aria-expanded="false" aria-controls="help-excluded" aria-label="説明を表示">?</button>
       </div>
-      <p id="help-excluded" class="help-text" hidden>20×20 の表だけで使います。当時は I と J、U と V を同じ文字として扱っていたので置き換えます。K・X・Y は表にないので外します。英字以外（空白・記号・数字）は暗号化から外し、下に一覧で示します。</p>
+      <p id="help-excluded" class="help-text" hidden>20×20の表だけで使います。当時はIとJ、UとVを同じ文字として扱っていたので置き換えます。K・X・Yは表にないので外します。英字以外（空白・記号・数字）は暗号化から外し、下に一覧で示します。</p>
       <div class="button-group">
         <button type="button" id="btnEncrypt">暗号化</button>
       </div>
@@ -152,7 +152,7 @@
       <div class="comm-instruction">
         <h3>💡 使い方</h3>
         <p><strong>平文（ふつうの文章）</strong>を入れてください。暗号文ではありません。</p>
-        <p>「送信＆受信」を押すと、いまの表で<strong>送る側の暗号化 → 数字の列の送信 → 受ける側の復号</strong>を通しで行います。冗字は表の既定（26×26 は X、20×20 は Z）、20×20 の表にない英字は置き換えます。</p>
+        <p>「送信＆受信」を押すと、いまの表で<strong>送る側の暗号化 → 数字の列の送信 → 受ける側の復号</strong>を通しで行います。冗字は表の既定（26×26はX、20×20はZ）、20×20の表にない英字は置き換えます。</p>
       </div>
       <label for="commInput" class="field-label">送りたい平文</label>
       <div class="textarea-container">
@@ -182,12 +182,67 @@
 
     <section id="docs" class="tab-content" role="tabpanel" aria-labelledby="tab-docs" tabindex="0" hidden>
       <h2>ポルタの二文字式暗号</h2>
-      <p>ポルタ（Giovanni Battista della Porta）は、1563年にナポリで刊行した暗号書『De Furtivis Literarum Notis』の第2巻第13章で、平文の2文字を記号1つに置き換える表を示しました。</p>
+      <p>ナポリの学者ジョヴァンニ・バッティスタ・デッラ・ポルタ（Giovanni Battista della Porta）は、1563年に刊行した暗号書『De Furtivis Literarum Notis』の第2巻第13章で、平文の2文字を記号1つに置き換える表を示しました。</p>
       <figure class="docs-figure">
         <img src="assets/porta_matrix.jpg" alt="ポルタの二文字式暗号の表。上と右に20文字のアルファベットが並び、400のマスに記号が1つずつ入っている" width="379" height="483">
         <figcaption>原典の表（20×20＝400マス）。上の見出しが1文字目、横の見出しが2文字目です。</figcaption>
       </figure>
-      <p>本ツールでは、記号の代わりに各マスへ重複のない3桁の数を割り当てて暗号化・復号します。</p>
+
+      <h3>表の作り方と引き方</h3>
+      <p>原典は、正方形の両辺を20等分して400のマスを作り、各マスに記号を1つずつ入れ、上辺と側面にアルファベットを並べると書いています。引き方は「1文字目の下にあり、2文字目と横から出会うマスの記号を取る」です。つまり上の見出しが1文字目、横の見出しが2文字目です。相手に知らせておけば逆に引いてもよい、とも書いています。</p>
+      <p>受け取った側は、曲尺（L字の定規）の角を記号に当てて上と横の文字を読みます。原典は、探しやすいように似た記号を同じ並びに置いたと述べています。</p>
+      <p>本ツールの表も原典と同じ向きで、上の見出しが1文字目、左の見出しが2文字目です。記号の代わりに、各マスへ重複のない3桁の数を入れます。</p>
+
+      <h3>20文字のアルファベット</h3>
+      <p>原典の表の文字はA B C D E F G H I L M N O P Q R S T V Zの20文字で、J・K・U・W・X・Yはありません。原典の例文もUをVで書いています（VNIVERSA、CIVITAS）。本ツールの20×20の表では、J→I、U→V、W→VVに置き換え、K・X・Yは外して一覧に示します（「外す」を選ぶとJ・U・Wも外します）。</p>
+
+      <h3>ポルタ自身の例文</h3>
+      <p class="latin" lang="la">MVLTIS CLADIBVS VLTRO CITROQVE DATIS ET ACCEPTIS, VNIVERSA PENE CIVITAS OCCVPATA EST, RELIQVA NON SCRIBAM, SED IN CONGRESSVM NOSTRVM RESERVABO.</p>
+      <p>試訳: 双方で多くの損害を与え、また受けたのち、町はほぼ全体が占領された。残りは書かず、会ったときのために取っておく。</p>
+      <p>英字は120個（60組）で、すべて20文字の表にあります。</p>
+      <div class="button-group">
+        <button type="button" id="btnUseExample" class="secondary">この例文を暗号化タブに入れる</button>
+      </div>
+
+      <h3>同じ記号は本当に「まれ」か</h3>
+      <p>原典は、2文字を1つの記号にするので、同じ記号が文中に2度出ることはまれだと述べています。しかし例文の120字の中でも、ISの組は3回、QV・ED・AT・ER・ST・REは2回ずつ出ます。英語の小説（ディケンズ『二都物語』）から切り出して数えると、次のとおりです。</p>
+      <div class="table-wrap">
+        <table class="data-table">
+          <caption>2文字ずつ区切ったとき、2回以上出る組が占める割合（200か所の平均）</caption>
+          <thead>
+            <tr><th scope="col">英字の数</th><th scope="col">組の数</th><th scope="col">2回以上出る組の割合</th><th scope="col">最多の組の回数</th></tr>
+          </thead>
+          <tbody>
+            <tr><td>100</td><td>50</td><td>29.4%</td><td>3.1</td></tr>
+            <tr><td>200</td><td>100</td><td>45.4%</td><td>4.8</td></tr>
+            <tr><td>1,000</td><td>500</td><td>82.4%</td><td>18.2</td></tr>
+          </tbody>
+        </table>
+      </div>
+      <p>英語ではTH・HE・ERなどの組が多く出ます。この偏りは、二文字式の暗号を解く手がかりになります（二文字の頻度分析）。「通信シミュレーター」で長めの文を送ると、同じ数が何度も出るのを確かめられます。</p>
+
+      <h3>本ツールの表（鍵）と乱数</h3>
+      <ul>
+        <li>シードを入れたときは擬似乱数（cyrb128＋sfc32）で表を作る。同じシードから同じ表を作り直せるが、表の推測しにくさはシードの推測しにくさで決まる</li>
+        <li>シードが空欄のときは暗号用の乱数（crypto.getRandomValues）で作る。20×20の表の並べ方は約2の3850乗通りある</li>
+        <li>鍵はJSONで書き出し・読み込みできる（matrix[1文字目][2文字目]の形）</li>
+      </ul>
+
+      <h3>関連ツール</h3>
+      <ul>
+        <li><a href="https://ipusiron.github.io/playfair-cipherlab/" target="_blank" rel="noopener noreferrer">Playfair CipherLab</a>（Day027）: 5×5の表から規則で2文字を2文字に換える二文字式の暗号</li>
+        <li><a href="https://ipusiron.github.io/hill-cipherlab/" target="_blank" rel="noopener noreferrer">Hill CipherLab</a>（Day093）: 行列の計算で複数の文字をまとめて換える暗号</li>
+        <li><a href="https://ipusiron.github.io/polybius-cipherlab/" target="_blank" rel="noopener noreferrer">Polybius CipherLab</a>（Day067）: 1文字を2つの数字に換える方陣</li>
+        <li><a href="https://ipusiron.github.io/classical-cipher-structure-trainer/" target="_blank" rel="noopener noreferrer">Classical Cipher Structure Trainer</a>（Day097）: 換字と転置の構造を学ぶ</li>
+      </ul>
+
+      <h3>出典</h3>
+      <ul class="sources">
+        <li>
+          Giovanni Battista della Porta, <cite>De Furtivis Literarum Notis, vulgo de Ziferis libri IIII</cite>, Naples, 1563, Liber II, cap. XIII
+          （<a href="https://archive.org/details/bub_gb_sc-Zaq8_jFIC" target="_blank" rel="noopener noreferrer">Internet Archive</a>）
+        </li>
+      </ul>
 
       <div class="security-warning">
         <h3>⚠️ セキュリティの注意</h3>
@@ -202,7 +257,7 @@
   </main>
 
   <footer class="footer">
-    🔗 GitHub リポジトリーはこちら（<a href="https://github.com/ipusiron/porta-cipherlab" target="_blank" rel="noopener noreferrer">ipusiron/porta-cipherlab</a>）
+    🔗 GitHubリポジトリーはこちら（<a href="https://github.com/ipusiron/porta-cipherlab" target="_blank" rel="noopener noreferrer">ipusiron/porta-cipherlab</a>）
   </footer>
 
   <div id="toast" class="toast" role="status" aria-live="polite"></div>
