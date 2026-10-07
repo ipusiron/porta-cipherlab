@@ -96,7 +96,7 @@ test('上限の記述は計算部の値と一致する', () => {
 
 test('README の画像はすべて実在し、assets の PNG は README から参照されているものだけ', () => {
   const refs = [...readme.matchAll(/!\[[^\]]*\]\((assets\/[^)]+\.png)\)/g)].map((m) => m[1]);
-  assert.equal(refs.length, 4);
+  assert.equal(refs.length, 6);
   assert.ok(readme.includes('](assets/porta1563_table.jpg)'));
   assert.ok(fs.existsSync(new URL('../assets/porta1563_table.jpg', import.meta.url)));
   for (const r of refs) assert.ok(fs.existsSync(new URL(`../${r}`, import.meta.url)), r);

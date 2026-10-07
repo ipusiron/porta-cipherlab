@@ -184,7 +184,8 @@
 
       <h3>記号を選んで読む</h3>
       <p>原典と同じ並びの表です。暗号文の記号と同じものを順に押すと、英字に戻します。原典は、探しやすいように似た記号を同じ列に集めています。表の中は矢印キーでも動けます。</p>
-      <div id="symPickerWrap" class="matrix-wrap sym-picker-wrap"></div>
+      <p id="symDecoded" class="lookup-result" aria-live="polite"></p>
+      <div id="symSelected" class="sym-output sym-small"></div>
       <div class="input-group checkbox-group">
         <input id="symStrip" type="checkbox">
         <label for="symStrip">末尾の冗字を外す</label>
@@ -193,8 +194,7 @@
         <button type="button" id="btnSymUndo" class="secondary">1つ戻す</button>
         <button type="button" id="btnSymReset" class="secondary">選んだ記号を消す</button>
       </div>
-      <p id="symDecoded" class="lookup-result" aria-live="polite"></p>
-      <div id="symSelected" class="sym-output sym-small"></div>
+      <div id="symPickerWrap" class="matrix-wrap sym-picker-wrap"></div>
 
       <h3>原典の暗号文を読んでみる</h3>
       <figure class="docs-figure wide">
@@ -255,6 +255,7 @@
       <p>受け取った側は、曲尺（L字の定規）の角を記号に当てて上と横の文字を読みます。原典は、探しやすいように似た記号を同じ並びに置いたと述べています。</p>
       <p>暗号史家のデイヴィッド・カーン（David Kahn）は『The Codebreakers』で、これを暗号学で最初の二文字式暗号と書いています。文字どうしを置き換える二文字式としては、19世紀のプレイフェア暗号が最初です。</p>
       <p>本ツールの表も原典と同じ向きで、上の見出しが1文字目、左の見出しが2文字目です。記号の代わりに、各マスへ重複のない3桁の数を入れます。</p>
+      <p>「原典の記号」タブでは、この表から切り出した記号そのもので暗号化できます。p.91に刷られたポルタの例文の暗号文も、この表で読むと例文に戻ります。</p>
 
       <h3>20文字のアルファベット</h3>
       <p>原典の表の文字はA B C D E F G H I L M N O P Q R S T V Zの20文字で、J・K・U・W・X・Yはありません。原典の例文もUをVで書いています（VNIVERSA、CIVITAS）。本ツールの20×20の表では、J→I、U→V、W→VVに置き換え、K・X・Yは外して一覧に示します（「外す」を選ぶとJ・U・Wも外します）。</p>
