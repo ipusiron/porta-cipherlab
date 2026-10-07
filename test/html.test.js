@@ -61,7 +61,7 @@ test('画面の処理が使う要素の id がそろっている', () => {
 
 test('タブは WAI-ARIA の tablist・tab・tabpanel で結ばれている', () => {
   const tabs = [...html.matchAll(/<button[^>]*role="tab"[^>]*>/g)].map((m) => m[0]);
-  assert.equal(tabs.length, 5);
+  assert.equal(tabs.length, 6);
   for (const tab of tabs) {
     const id = tab.match(/\sid="([^"]+)"/)[1];
     const panel = tab.match(/aria-controls="([^"]+)"/)[1];

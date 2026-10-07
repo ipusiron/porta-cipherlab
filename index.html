@@ -24,6 +24,7 @@
       <button type="button" class="tab-button" role="tab" id="tab-keygen" aria-controls="keygen" aria-selected="true">置換表</button>
       <button type="button" class="tab-button" role="tab" id="tab-encrypt" aria-controls="encrypt" aria-selected="false" tabindex="-1">暗号化</button>
       <button type="button" class="tab-button" role="tab" id="tab-decrypt" aria-controls="decrypt" aria-selected="false" tabindex="-1">復号</button>
+      <button type="button" class="tab-button" role="tab" id="tab-symbols" aria-controls="symbols" aria-selected="false" tabindex="-1">原典の記号</button>
       <button type="button" class="tab-button" role="tab" id="tab-comm" aria-controls="comm" aria-selected="false" tabindex="-1">通信シミュレーター</button>
       <button type="button" class="tab-button" role="tab" id="tab-docs" aria-controls="docs" aria-selected="false" tabindex="-1">座学</button>
     </div>
@@ -147,6 +148,67 @@
       <div id="decryptPairs" class="pairs"></div>
     </section>
 
+    <section id="symbols" class="tab-content" role="tabpanel" aria-labelledby="tab-symbols" tabindex="0" hidden>
+      <h2>原典の記号で暗号化・復号</h2>
+      <p>1563年初版p.90の表（リヨン市立図書館所蔵本のスキャン、Public Domain Mark 1.0）から切り出した400個の記号を使います。</p>
+      <p>表は原典の20文字（J・K・U・W・X・Yなし）に固定で、上の見出しが1文字目、右の見出しが2文字目です。</p>
+
+      <h3>平文を記号にする</h3>
+      <label for="symInput" class="field-label">平文</label>
+      <div class="textarea-container">
+        <textarea id="symInput" rows="4" placeholder="平文を入力（例: Attack at dawn）"></textarea>
+        <button type="button" id="btnSymClear" class="clear-button">クリア</button>
+      </div>
+      <div class="input-group">
+        <label for="symDummy">冗字</label>
+        <input id="symDummy" type="text" value="Z" maxlength="1" autocomplete="off" spellcheck="false">
+      </div>
+      <div class="input-group">
+        <label for="symHandling">表にない英字</label>
+        <select id="symHandling">
+          <option value="replace">置き換える（J→I・U→V・W→VV）</option>
+          <option value="drop">外す</option>
+        </select>
+      </div>
+      <div class="input-group checkbox-group">
+        <input id="symShowPairs" type="checkbox" checked>
+        <label for="symShowPairs">記号の下に組の文字を出す</label>
+      </div>
+      <div class="button-group">
+        <button type="button" id="btnSymEncrypt">記号にする</button>
+        <button type="button" id="btnSymExample" class="secondary">ポルタの例文を入れる</button>
+        <button type="button" id="btnSymSave" class="secondary" disabled>PNGで保存</button>
+      </div>
+      <div id="symMessages" class="messages" role="status" aria-live="polite"></div>
+      <div id="symOutput" class="sym-output"></div>
+
+      <h3>記号を選んで読む</h3>
+      <p>原典と同じ並びの表です。暗号文の記号と同じものを順に押すと、英字に戻します。原典は、探しやすいように似た記号を同じ列に集めています。表の中は矢印キーでも動けます。</p>
+      <div id="symPickerWrap" class="matrix-wrap sym-picker-wrap"></div>
+      <div class="input-group checkbox-group">
+        <input id="symStrip" type="checkbox">
+        <label for="symStrip">末尾の冗字を外す</label>
+      </div>
+      <div class="button-group">
+        <button type="button" id="btnSymUndo" class="secondary">1つ戻す</button>
+        <button type="button" id="btnSymReset" class="secondary">選んだ記号を消す</button>
+      </div>
+      <p id="symDecoded" class="lookup-result" aria-live="polite"></p>
+      <div id="symSelected" class="sym-output sym-small"></div>
+
+      <h3>原典の暗号文を読んでみる</h3>
+      <figure class="docs-figure wide">
+        <img src="assets/porta1563_example.jpg" alt="ポルタの例文の暗号文。飾り枠の中に記号が5行に並んでいる" width="900" height="478">
+        <figcaption>1563年初版p.91に刷られたポルタの例文の暗号文（記号60個、5行）。リヨン市立図書館所蔵本のスキャン（Public Domain Mark 1.0）。</figcaption>
+      </figure>
+      <p>上の表から記号を順に選ぶと読めます。最初の記号は、Mの列とVの行が交わるマスにあります。</p>
+      <details class="answer">
+        <summary>答え: このツールで同じ例文を記号にした列</summary>
+        <div id="symAnswer" class="sym-output"></div>
+        <p>刷られた暗号文と1つずつ見比べると、60個すべてが同じ順に並びます。逆に引いた表（1文字目を横の見出し）では、最初の記号から食い違います。</p>
+      </details>
+    </section>
+
     <section id="comm" class="tab-content" role="tabpanel" aria-labelledby="tab-comm" tabindex="0" hidden>
       <h2>通信シミュレーター</h2>
       <div class="comm-instruction">
@@ -185,10 +247,7 @@
       <p>ナポリの学者ジョヴァンニ・バッティスタ・デッラ・ポルタ（Giovanni Battista della Porta、1535年ごろ〜1615年）は、1563年に刊行した暗号書『De Furtivis Literarum Notis』の第2巻第13章で、平文の2文字を記号1つに置き換える表を示しました。</p>
       <figure class="docs-figure">
         <img src="assets/porta1563_table.jpg" alt="ポルタの二文字式暗号の表。上と右に20文字のアルファベットが並び、400のマスに記号が1つずつ入っている" width="900" height="1115">
-        <figcaption>
-          原典の表（20×20＝400マス、1563年初版p.90）。上の見出しが1文字目、右の見出しが2文字目です。
-          画像はリヨン市立図書館所蔵本のスキャン（Internet Archive、Public Domain Mark 1.0）から表の部分を切り出したものです。
-        </figcaption>
+        <figcaption>原典の表（20×20＝400マス、1563年初版p.90）。上の見出しが1文字目、右の見出しが2文字目です。リヨン市立図書館所蔵本のスキャン（Public Domain Mark 1.0）。</figcaption>
       </figure>
 
       <h3>表の作り方と引き方</h3>
@@ -242,10 +301,7 @@
 
       <h3>出典</h3>
       <ul class="sources">
-        <li>
-          Giovanni Battista della Porta, <cite>De Furtivis Literarum Notis, vulgo de Ziferis libri IIII</cite>, Naples, 1563, Liber II, cap. XIII
-          （<a href="https://archive.org/details/bub_gb_sc-Zaq8_jFIC" target="_blank" rel="noopener noreferrer">Internet Archive</a>）
-        </li>
+        <li>G. B. della Porta, <cite>De Furtivis Literarum Notis</cite>, Naples, 1563, Liber II, cap. XIII（<a href="https://archive.org/details/bub_gb_sc-Zaq8_jFIC" target="_blank" rel="noopener noreferrer">Internet Archive</a>）</li>
       </ul>
 
       <div class="security-warning">

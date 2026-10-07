@@ -8,8 +8,8 @@ const C = core();
 const readme = read('README.md');
 const yaml = readme.match(/^<!--\n---\n([\s\S]*?)\n---\n-->/)[1];
 
-// ひらがな・カタカナ・CJK統合漢字・全角形（数値から組み立てる）
-const JP = `${String.fromCodePoint(0x3040)}-${String.fromCodePoint(0x30ff)}${String.fromCodePoint(0x4e00)}-${String.fromCodePoint(0x9fff)}`
+// 和文の句読点・ひらがな・カタカナ・CJK統合漢字・全角形（数値から組み立てる。U+3000 の全角空白は含めない）
+const JP = `${String.fromCodePoint(0x3001)}-${String.fromCodePoint(0x30ff)}${String.fromCodePoint(0x4e00)}-${String.fromCodePoint(0x9fff)}`
   + `${String.fromCodePoint(0xff00)}-${String.fromCodePoint(0xffef)}`;
 const SPACED = new RegExp(`[${JP}] [A-Za-z0-9\`]|[A-Za-z0-9\`] [${JP}]`, 'u');
 

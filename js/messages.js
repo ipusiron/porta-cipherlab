@@ -77,6 +77,15 @@
     'dec.summary': '3桁の数{codes}個 → 英字{letters}文字',
     'dec.pairsTitle': '数と組の対応',
 
+    // 原典の記号
+    'sym.label': '{first}の列と{second}の行の記号',
+    'sym.summary': '英字{letters}文字 → 記号{count}個',
+    'sym.saved': 'PNGで保存しました（{name}）',
+    'sym.saveFailed': 'PNGで保存できませんでした。ファイルとして開いたページ（file://）では、ブラウザーによって画像の書き出しが止められます（ChromeやEdgeなど）。HTTPで配信したページか公開ページで試してください。',
+    'sym.pickerCaption': '原典の表（上の見出し＝1文字目、右の見出し＝2文字目）',
+    'sym.decoded': '選んだ記号{count}個 → {letters}',
+    'sym.decodedEmpty': '表の記号を押すと、ここに英字が出ます。',
+
     // 通信シミュレーター
     'comm.step1': '【送信側】元の平文: {text}\n表で使う英字: {letters}',
     'comm.step1Replaced': '置き換えた文字: {list}',

@@ -516,6 +516,254 @@
   });
   $('commInput').addEventListener('input', clearCommResult);
 
+  // ---- 原典の記号 ----
+  const SP = C.SYMBOL_SPRITE;
+
+  // 記号1つ（スプライトの一部を背景に出す）。位置は CSS 変数で渡す（CSSOM なので CSP の対象外）
+  function symbolGlyph(cell) {
+    const g = document.createElement('span');
+    g.className = 'sym';
+    g.setAttribute('role', 'img');
+    g.setAttribute('aria-label', t('sym.label', { first: cell.pair[0], second: cell.pair[1] }));
+    g.style.setProperty('--c', String(cell.col));
+    g.style.setProperty('--r', String(cell.row));
+    return g;
+  }
+
+  // 記号の列を行に分けて描く。showPairs なら記号の下に組の文字を出す
+  function renderSymbols(container, cells, showPairs, counts) {
+    container.replaceChildren();
+    const lines = counts ? C.splitLines(cells, counts) : [cells];
+    for (const line of lines) {
+      const row = document.createElement('div');
+      row.className = 'sym-line';
+      for (const cell of line) {
+        const item = document.createElement('span');
+        item.className = 'sym-item';
+        item.appendChild(symbolGlyph(cell));
+        if (showPairs) {
+          const label = document.createElement('span');
+          label.className = 'sym-pair';
+          label.textContent = cell.pair;
+          item.appendChild(label);
+        }
+        row.appendChild(item);
+      }
+      container.appendChild(row);
+    }
+  }
+
+  const symState = { cells: [], selected: [] };
+
+  function clearSymResult() {
+    symState.cells = [];
+    $('symOutput').replaceChildren();
+    showMessages($('symMessages'), []);
+    $('btnSymSave').disabled = true;
+  }
+
+  $('btnSymEncrypt').addEventListener('click', () => {
+    clearSymResult();
+    const r = C.encryptSymbols($('symInput').value, { dummy: $('symDummy').value, handling20: $('symHandling').value });
+    if (!r.ok) {
+      showMessages($('symMessages'), [{ text: tm(r.error), kind: 'error' }]);
+      return;
+    }
+    symState.cells = r.cells;
+    renderSymbols($('symOutput'), r.cells, $('symShowPairs').checked);
+    const msgs = [{ text: t('sym.summary', { letters: r.letters.length, count: r.cells.length }), kind: 'success' }];
+    if (r.padded) msgs.push({ text: t('enc.padded', { dummy: r.dummy }) });
+    if (r.replaced.length) msgs.push({ text: t('enc.replaced', { count: r.replaced.length, list: listText(r.replaced, replacedItem) }) });
+    if (r.dropped.length) msgs.push({ text: t('enc.dropped', { count: r.dropped.length, list: droppedText(r.dropped) }) });
+    for (const w of r.warnings) msgs.push({ text: tm(w), kind: 'warning' });
+    showMessages($('symMessages'), msgs);
+    $('btnSymSave').disabled = false;
+  });
+
+  $('btnSymExample').addEventListener('click', () => {
+    $('symInput').value = C.PORTA_EXAMPLE;
+    clearSymResult();
+  });
+  $('btnSymClear').addEventListener('click', () => {
+    $('symInput').value = '';
+    clearSymResult();
+  });
+  for (const id of ['symInput', 'symDummy', 'symHandling']) $(id).addEventListener('input', clearSymResult);
+  $('symShowPairs').addEventListener('change', () => {
+    if (symState.cells.length) renderSymbols($('symOutput'), symState.cells, $('symShowPairs').checked);
+  });
+
+  // PNG で保存（1行15個、組の文字は表示の設定に合わせる）
+  let spriteImage = null;
+  function loadSprite() {
+    if (!spriteImage) {
+      spriteImage = new Image();
+      spriteImage.src = SP.file;
+    }
+    return spriteImage.decode().then(() => spriteImage);
+  }
+
+  $('btnSymSave').addEventListener('click', async () => {
+    const cells = symState.cells;
+    if (!cells.length) return;
+    const showPairs = $('symShowPairs').checked;
+    const perLine = 15;
+    const gap = 6;
+    const labelH = showPairs ? 22 : 0;
+    const cellW = SP.tileW + gap;
+    const cellH = SP.tileH + labelH + gap;
+    const lines = Math.ceil(cells.length / perLine);
+    const canvas = document.createElement('canvas');
+    canvas.width = Math.min(cells.length, perLine) * cellW + gap;
+    canvas.height = lines * cellH + gap;
+    const ctx = canvas.getContext('2d');
+    ctx.fillStyle = '#ffffff';
+    ctx.fillRect(0, 0, canvas.width, canvas.height);
+    try {
+      const img = await loadSprite();
+      ctx.fillStyle = '#333333';
+      ctx.font = 'bold 15px monospace';
+      ctx.textAlign = 'center';
+      cells.forEach((cell, i) => {
+        const x = gap + (i % perLine) * cellW;
+        const y = gap + Math.floor(i / perLine) * cellH;
+        ctx.drawImage(img, cell.col * SP.tileW, cell.row * SP.tileH, SP.tileW, SP.tileH, x, y, SP.tileW, SP.tileH);
+        if (showPairs) ctx.fillText(cell.pair, x + SP.tileW / 2, y + SP.tileH + 16);
+      });
+      const blob = await new Promise((resolve, reject) => {
+        try {
+          canvas.toBlob((b) => (b ? resolve(b) : reject(new Error('toBlob'))), 'image/png');
+        } catch (e) {
+          reject(e);
+        }
+      });
+      const name = 'porta-symbols.png';
+      const url = URL.createObjectURL(blob);
+      const a = document.createElement('a');
+      a.href = url;
+      a.download = name;
+      document.body.appendChild(a);
+      a.click();
+      a.remove();
+      setTimeout(() => URL.revokeObjectURL(url), 1000);
+      showToast(t('sym.saved', { name }));
+    } catch (e) {
+      showMessages($('symMessages'), [{ text: t('sym.saveFailed'), kind: 'warning' }]);
+    }
+  });
+
+  // 記号を選ぶ表（原典と同じ並び: 上の見出し＝1文字目、右の見出し＝2文字目）。矢印キーで動く（ロービング tabindex）
+  const pickerButtons = [];
+  function buildPicker() {
+    const table = document.createElement('table');
+    table.className = 'sym-picker';
+    const cap = document.createElement('caption');
+    cap.textContent = t('sym.pickerCaption');
+    table.appendChild(cap);
+    const thead = document.createElement('thead');
+    const hr = document.createElement('tr');
+    for (const ch of C.ALPHABET_20) {
+      const th = document.createElement('th');
+      th.scope = 'col';
+      th.textContent = ch;
+      hr.appendChild(th);
+    }
+    hr.appendChild(document.createElement('td'));
+    thead.appendChild(hr);
+    const tbody = document.createElement('tbody');
+    for (let r = 0; r < 20; r++) {
+      const tr = document.createElement('tr');
+      for (let c = 0; c < 20; c++) {
+        const cell = C.symbolCell(C.pairFromCell(c, r));
+        const td = document.createElement('td');
+        const btn = document.createElement('button');
+        btn.type = 'button';
+        btn.className = 'sym-btn';
+        btn.tabIndex = c === 0 && r === 0 ? 0 : -1;
+        btn.dataset.col = String(c);
+        btn.dataset.row = String(r);
+        btn.setAttribute('aria-label', t('sym.label', { first: cell.pair[0], second: cell.pair[1] }));
+        const g = symbolGlyph(cell);
+        g.setAttribute('aria-hidden', 'true');
+        g.removeAttribute('role');
+        g.removeAttribute('aria-label');
+        btn.appendChild(g);
+        td.appendChild(btn);
+        tr.appendChild(td);
+        pickerButtons.push(btn);
+      }
+      const th = document.createElement('th');
+      th.scope = 'row';
+      th.textContent = C.ALPHABET_20[r];
+      tr.appendChild(th);
+      tbody.appendChild(tr);
+    }
+    table.append(thead, tbody);
+    $('symPickerWrap').replaceChildren(table);
+  }
+
+  function pickerButton(c, r) {
+    return pickerButtons[r * 20 + c];
+  }
+
+  function updateDecoded() {
+    const r = C.decodeSymbols(symState.selected, { dummy: $('symDummy').value, stripDummy: $('symStrip').checked });
+    renderSymbols($('symSelected'), symState.selected, true);
+    if (!symState.selected.length) {
+      $('symDecoded').textContent = t('sym.decodedEmpty');
+      return;
+    }
+    $('symDecoded').textContent = t('sym.decoded', { count: symState.selected.length, letters: r.ok ? r.letters : '' });
+  }
+
+  $('symPickerWrap').addEventListener('click', (e) => {
+    const btn = e.target.closest('button.sym-btn');
+    if (!btn) return;
+    const cell = C.symbolCell(C.pairFromCell(Number(btn.dataset.col), Number(btn.dataset.row)));
+    symState.selected.push(cell);
+    updateDecoded();
+  });
+
+  $('symPickerWrap').addEventListener('keydown', (e) => {
+    const btn = e.target.closest('button.sym-btn');
+    if (!btn) return;
+    let c = Number(btn.dataset.col);
+    let r = Number(btn.dataset.row);
+    if (e.key === 'ArrowRight') c = Math.min(19, c + 1);
+    else if (e.key === 'ArrowLeft') c = Math.max(0, c - 1);
+    else if (e.key === 'ArrowDown') r = Math.min(19, r + 1);
+    else if (e.key === 'ArrowUp') r = Math.max(0, r - 1);
+    else if (e.key === 'Home') c = 0;
+    else if (e.key === 'End') c = 19;
+    else return;
+    e.preventDefault();
+    btn.tabIndex = -1;
+    const next = pickerButton(c, r);
+    next.tabIndex = 0;
+    next.focus();
+  });
+
+  $('btnSymUndo').addEventListener('click', () => {
+    symState.selected.pop();
+    updateDecoded();
+  });
+  $('btnSymReset').addEventListener('click', () => {
+    symState.selected = [];
+    updateDecoded();
+  });
+  $('symStrip').addEventListener('change', updateDecoded);
+  $('symDummy').addEventListener('input', updateDecoded);
+
+  // 答え: ポルタの例文を、刷られた暗号文と同じ行の分け方で描く
+  function renderAnswer() {
+    const r = C.encryptSymbols(C.PORTA_EXAMPLE);
+    renderSymbols($('symAnswer'), r.cells, true, C.PORTA_EXAMPLE_LINES);
+  }
+
+  buildPicker();
+  updateDecoded();
+  renderAnswer();
+
   // ---- 座学: ポルタの例文を暗号化タブへ ----
   const PORTA_EXAMPLE = 'MVLTIS CLADIBVS VLTRO CITROQVE DATIS ET ACCEPTIS, VNIVERSA PENE CIVITAS OCCVPATA EST, '
     + 'RELIQVA NON SCRIBAM, SED IN CONGRESSVM NOSTRVM RESERVABO.';
