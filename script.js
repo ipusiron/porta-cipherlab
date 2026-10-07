@@ -112,9 +112,22 @@
     if (entries.length > LIST_MAX) shown.push(t('enc.more', { count: entries.length - LIST_MAX }));
     return shown.join(t('list.sep'));
   }
-  const droppedItem = (d) => (d.reason === 'space'
-    ? t('item.droppedSpace', { pos: d.pos })
-    : t('item.dropped', { pos: d.pos, char: d.char, reason: t(`reason.${d.reason}`) }));
+  // 外した文字は種類ごとにまとめる。空白は数だけ、ほかは位置つき
+  const DROP_REASONS = ['notInTable', 'digit', 'symbol', 'space'];
+  function droppedText(dropped) {
+    const groups = [];
+    for (const reason of DROP_REASONS) {
+      const items = dropped.filter((d) => d.reason === reason);
+      if (items.length === 0) continue;
+      if (reason === 'space') {
+        groups.push(t('group.space', { count: items.length }));
+      } else {
+        const list = listText(items, (d) => t('item.dropped', { pos: d.pos, char: d.char }));
+        groups.push(t('group.withList', { reason: t(`reason.${reason}`), count: items.length, list }));
+      }
+    }
+    return groups.join(t('group.sep'));
+  }
   const replacedItem = (r) => t('item.replaced', { pos: r.pos, char: r.char, to: r.to });
 
   // 組と数の対応を小さな札で並べる
@@ -391,7 +404,7 @@
     msgs.push({ text: t('enc.summary', { letters: r.letters.length, pairs: r.pairs.length }), kind: 'success' });
     if (r.padded) msgs.push({ text: t('enc.padded', { dummy: r.dummy }) });
     if (r.replaced.length) msgs.push({ text: t('enc.replaced', { count: r.replaced.length, list: listText(r.replaced, replacedItem) }) });
-    if (r.dropped.length) msgs.push({ text: t('enc.dropped', { count: r.dropped.length, list: listText(r.dropped, droppedItem) }) });
+    if (r.dropped.length) msgs.push({ text: t('enc.dropped', { count: r.dropped.length, list: droppedText(r.dropped) }) });
     for (const w of r.warnings) msgs.push({ text: tm(w), kind: 'warning' });
     showMessages($('encryptMessages'), msgs);
     showPairs($('encryptPairs'), t('enc.pairsTitle'), r.pairs.map((p, i) => [p, r.codes[i]]));
@@ -468,7 +481,7 @@
     const { enc, dec } = r;
     const step1 = [t('comm.step1', { text, letters: enc.letters })];
     if (enc.replaced.length) step1.push(t('comm.step1Replaced', { list: listText(enc.replaced, replacedItem) }));
-    if (enc.dropped.length) step1.push(t('comm.step1Dropped', { count: enc.dropped.length, list: listText(enc.dropped, droppedItem) }));
+    if (enc.dropped.length) step1.push(t('comm.step1Dropped', { count: enc.dropped.length, list: droppedText(enc.dropped) }));
     const target = enc.pairs.join('');
     if (enc.padded) step1.push(t('comm.step1Padded', { dummy: enc.dummy, letters: target }));
     step1.push(t('comm.step1Result', { letters: target }));
