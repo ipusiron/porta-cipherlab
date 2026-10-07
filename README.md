@@ -298,37 +298,40 @@ npm test
 
 ```text
 porta-cipherlab/
-├── .github/                 # GitHubの設定
-│   └── workflows/           # GitHub Actionsのワークフロー
-│       └── test.yml         # pushとpull requestでnpm testを実行する
-├── assets/                  # 画像
-│   ├── porta1563_table.jpg  # 原典の表（1563年初版p.90、Public Domain Mark 1.0）
-│   ├── screenshot.png       # 置換表タブ（26×26の表でHEを引いたところ）
-│   ├── screenshot2.png      # 暗号化タブ（20×20の表でポルタの例文を暗号化）
-│   ├── screenshot3.png      # 通信シミュレーター（同じ数が2回出る）
-│   └── screenshot4.png      # 座学タブ（表の作り方・引き方とポルタの例文）
-├── js/                      # 画面から読む通常のスクリプト
-│   ├── messages.js          # 画面に出す文言の辞書
-│   └── porta-core.js        # 計算部（正規化・暗号化・復号・鍵の生成と検証）
-├── test/                    # 自動テスト（node --test）
-│   ├── contrast.test.js     # 配色のコントラスト比
-│   ├── core.test.js         # 計算部（既知解答・往復・鍵の検証）
-│   ├── format.test.js       # 行の長さと表記
-│   ├── html.test.js         # index.htmlの静的検証（CSP・ARIA・id）
-│   ├── load.js              # テストから画面と同じスクリプトを読み込む
-│   ├── messages.test.js     # 辞書のキー
-│   └── readme.test.js       # READMEの例・画像・ディレクトリー構造
-├── .gitignore               # Gitの除外設定
-├── .nojekyll                # GitHub PagesでJekyllを使わない
-├── AGENTS.md                # コーディングエージェント向けの作業ルール
-├── CLAUDE.md                # Claude Code向けのプロジェクト情報
-├── index.html               # 画面（5つのタブ）
-├── LICENSE                  # MITライセンス
-├── package.json             # npm testの定義（依存なし）
-├── README.md                # 本ファイル
-├── script.js                # 画面の処理（タブ・表・入出力）
-├── SECURITY_REVIEW.md       # セキュリティレビューの結果
-└── style.css                # スタイル
+├── .github/                   # GitHubの設定
+│   └── workflows/             # GitHub Actionsのワークフロー
+│       └── test.yml           # pushとpull requestでnpm testを実行する
+├── assets/                    # 画像
+│   ├── porta1563_example.jpg  # ポルタの例文の暗号文（1563年初版p.91、Public Domain Mark 1.0）
+│   ├── porta1563_symbols.png  # 原典の表から切り出した記号400個（20×20、1マス52×64px）
+│   ├── porta1563_table.jpg    # 原典の表（1563年初版p.90、Public Domain Mark 1.0）
+│   ├── screenshot.png         # 置換表タブ（26×26の表でHEを引いたところ）
+│   ├── screenshot2.png        # 暗号化タブ（20×20の表でポルタの例文を暗号化）
+│   ├── screenshot3.png        # 通信シミュレーター（同じ数が2回出る）
+│   └── screenshot4.png        # 座学タブ（表の作り方・引き方とポルタの例文）
+├── js/                        # 画面から読む通常のスクリプト
+│   ├── messages.js            # 画面に出す文言の辞書
+│   └── porta-core.js          # 計算部（正規化・暗号化・復号・鍵の生成と検証）
+├── test/                      # 自動テスト（node --test）
+│   ├── contrast.test.js       # 配色のコントラスト比
+│   ├── core.test.js           # 計算部（既知解答・往復・鍵の検証）
+│   ├── format.test.js         # 行の長さと表記
+│   ├── html.test.js           # index.htmlの静的検証（CSP・ARIA・id）
+│   ├── load.js                # テストから画面と同じスクリプトを読み込む
+│   ├── messages.test.js       # 辞書のキー
+│   ├── readme.test.js         # READMEの例・画像・ディレクトリー構造
+│   └── symbols.test.js        # 原典の記号（組とマスの位置・例文・画像の固定）
+├── .gitignore                 # Gitの除外設定
+├── .nojekyll                  # GitHub PagesでJekyllを使わない
+├── AGENTS.md                  # コーディングエージェント向けの作業ルール
+├── CLAUDE.md                  # Claude Code向けのプロジェクト情報
+├── index.html                 # 画面（5つのタブ）
+├── LICENSE                    # MITライセンス
+├── package.json               # npm testの定義（依存なし）
+├── README.md                  # 本ファイル
+├── script.js                  # 画面の処理（タブ・表・入出力）
+├── SECURITY_REVIEW.md         # セキュリティレビューの結果
+└── style.css                  # スタイル
 ```
 
 ---

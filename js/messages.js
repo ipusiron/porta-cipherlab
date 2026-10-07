@@ -51,6 +51,7 @@
     'error.keyReserved': '予約コード（reserved）が3桁の数の並びになっていません。',
     'error.keyReservedClash': '予約コード {code} が表のマスにも使われています。',
     'error.fileRead': 'ファイルを読めませんでした。',
+    'error.badSymbol': '記号の位置が表の範囲の外です。',
 
     // 警告
     'warn.endsWithDummy': '平文の英字は偶数個で、最後が冗字と同じ「{dummy}」です。受け取る側が「末尾の冗字を外す」で復号すると、この「{dummy}」も消えます。冗字を別の文字にするか、相手に伝えてください。',

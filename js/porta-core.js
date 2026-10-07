@@ -402,11 +402,85 @@
     return rows;
   }
 
+  // ---- 原典の記号（1563年初版 p.90 の表から切り出した400個） ----
+
+  // assets/porta1563_symbols.png の並び: 列＝1文字目（上の見出し）、行＝2文字目（右の見出し）。1マスは52×64px
+  const SYMBOL_SPRITE = { file: 'assets/porta1563_symbols.png', cols: 20, rows: 20, tileW: 52, tileH: 64 };
+
+  // ポルタ自身の例文（第2巻第13章 p.91）と、刷られた暗号文の行ごとの記号の数
+  const PORTA_EXAMPLE = 'MVLTIS CLADIBVS VLTRO CITROQVE DATIS ET ACCEPTIS, VNIVERSA PENE CIVITAS OCCVPATA EST, '
+    + 'RELIQVA NON SCRIBAM, SED IN CONGRESSVM NOSTRVM RESERVABO.';
+  const PORTA_EXAMPLE_LINES = [15, 12, 15, 13, 5];
+
+  // 2文字の組 → スプライトの列と行（20文字の表にない文字なら null）
+  function symbolCell(pair) {
+    if (typeof pair !== 'string' || pair.length !== 2) return null;
+    const col = ALPHABET_20.indexOf(pair[0]);
+    const row = ALPHABET_20.indexOf(pair[1]);
+    if (col < 0 || row < 0) return null;
+    return { pair, col, row };
+  }
+
+  // スプライトの列と行 → 2文字の組
+  function pairFromCell(col, row) {
+    if (!Number.isInteger(col) || !Number.isInteger(row) || col < 0 || row < 0 || col >= 20 || row >= 20) return null;
+    return ALPHABET_20[col] + ALPHABET_20[row];
+  }
+
+  // 原典の記号で暗号化する。表は20文字の原典の表に固定。options: { dummy, handling20 }
+  function encryptSymbols(text, options) {
+    const opt = options || {};
+    const d = checkDummy(opt.dummy === undefined ? DEFAULT_DUMMY[20] : opt.dummy, 20);
+    if (!d.ok) return d;
+    const norm = normalizeText(text, 20, opt);
+    if (!norm.ok) return norm;
+    if (norm.letters.length === 0) {
+      return { ok: false, error: msg('error.noLetters'), dropped: norm.dropped, replaced: norm.replaced };
+    }
+    const { pairs, padded } = toPairs(norm.letters, d.dummy);
+    const cells = pairs.map(symbolCell);
+    const warnings = [];
+    if (!padded && norm.letters.endsWith(d.dummy)) warnings.push(msg('warn.endsWithDummy', { dummy: d.dummy }));
+    return {
+      ok: true, cells, pairs, padded, dummy: d.dummy,
+      letters: norm.letters, dropped: norm.dropped, replaced: norm.replaced, warnings,
+    };
+  }
+
+  // 選んだ記号（{ col, row } の列）を英字に戻す。末尾の冗字を外すかは stripDummy
+  function decodeSymbols(cells, options) {
+    const opt = options || {};
+    const pairs = (cells || []).map((c) => pairFromCell(c.col, c.row));
+    if (pairs.some((p) => p === null)) return { ok: false, error: msg('error.badSymbol') };
+    let letters = pairs.join('');
+    const dummy = toAsciiUpper(String(opt.dummy === undefined ? DEFAULT_DUMMY[20] : opt.dummy));
+    let strippedDummy = false;
+    if (opt.stripDummy && letters.length > 0 && letters.endsWith(dummy)) {
+      letters = letters.slice(0, -1);
+      strippedDummy = true;
+    }
+    return { ok: true, pairs, letters, strippedDummy };
+  }
+
+  // 並びを行に分ける（counts の数ずつ。余りは最後の行に続ける）
+  function splitLines(items, counts) {
+    const lines = [];
+    let i = 0;
+    for (const n of counts) {
+      if (i >= items.length) break;
+      lines.push(items.slice(i, i + n));
+      i += n;
+    }
+    if (i < items.length) lines.push(items.slice(i));
+    return lines;
+  }
+
   root.PortaCore = {
     ALPHABET_20, ALPHABET_26, ALPHABETS, REPLACE_20, DEFAULT_DUMMY, DEFAULT_RESERVED, CODE_COUNT, LIMITS, KEY_FORMAT,
     alphabetFor, sizeOfAlphabet, toAsciiUpper, normalizeText, toPairs, checkDummy, lookup, reverseIndex,
     encrypt, parseCiphertext, decrypt, simulate,
     cryptoUint32Source, cyrb128, seededUint32Source, randomBelow,
     parseReserved, makeKey, exportKey, importKey, displayRows,
+    SYMBOL_SPRITE, PORTA_EXAMPLE, PORTA_EXAMPLE_LINES, symbolCell, pairFromCell, encryptSymbols, decodeSymbols, splitLines,
   };
 })(typeof globalThis !== 'undefined' ? globalThis : this);

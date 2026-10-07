@@ -100,7 +100,11 @@ test('README の画像はすべて実在し、assets の PNG は README から�
   assert.ok(readme.includes('](assets/porta1563_table.jpg)'));
   assert.ok(fs.existsSync(new URL('../assets/porta1563_table.jpg', import.meta.url)));
   for (const r of refs) assert.ok(fs.existsSync(new URL(`../${r}`, import.meta.url)), r);
-  const pngs = fs.readdirSync(new URL('../assets/', import.meta.url)).filter((f) => f.endsWith('.png')).map((f) => `assets/${f}`);
+  // 画面が使う素材（記号のスプライト）は README の画像の対象から外し、計算部から参照されていることを確かめる
+  const toolAssets = [C.SYMBOL_SPRITE.file];
+  for (const f of toolAssets) assert.ok(fs.existsSync(new URL(`../${f}`, import.meta.url)), f);
+  const pngs = fs.readdirSync(new URL('../assets/', import.meta.url)).filter((f) => f.endsWith('.png')).map((f) => `assets/${f}`)
+    .filter((f) => !toolAssets.includes(f));
   assert.deepEqual(pngs.sort(), refs.slice().sort());
 });
 
