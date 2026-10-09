@@ -220,6 +220,12 @@ A seed that is a short word can be found by trying dictionary words one by one.
 
 ## 🎯 Use cases
 
+### Ways of using this tool in particular
+
+- Confirming that the same table can be rebuilt from a seed (key-distribution and reproducibility classes): build a 20x20 table with the seed PORTA1563 and encrypt "Jupiter was here" with replacement, and it always gives `788 505 701 141 757 717 726 501`. The same seed makes the same 400-cell table, so sharing a short seed lets both sides build the same key table at hand. It is the idea of rebuilding a key from a short secret, and it also shows the weakness that guessing the seed reproduces the whole table
+- Confirming that the same pair of letters always becomes the same number (bigram frequency-analysis classes): this cipher replaces two letters together with one number. With the PORTA1563 table, encrypting "IN IN IN" joined gives `441 441 441`, so the same "IN" is always the same 441. It shows that in a long text, from the repetition of the same number, you can do bigram frequency analysis of which pairs of letters are common
+- Confirming that 400 cells are filled with numbers without repeats (combinatorics and data classes): the 20x20 = 400 cells are filled, without repeats, from the 1000 numbers 000 to 999 minus the reserved codes. A Fisher-Yates shuffle is used and the first 400 are taken, so all 400 cells hold different numbers. You can confirm it, rebuilding the table, as a concrete example of arranging 400 out of 1000 without repeats
+
 ### Learning and teaching
 
 - World history classes: show the table of a 16th-century cipher book (the image in the Background tab) next to the number version of the same mechanism, as material for talking about why diplomacy and war in the Renaissance needed ciphers

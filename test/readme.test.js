@@ -215,3 +215,22 @@ test('英語版に日本語の文字が混じらない（言語のリンクを�
   const re = new RegExp(`[${JP}]`, 'u');
   readmeEn.split('\n').slice(1).forEach((line, i) => assert.ok(!re.test(line), `${i + 2}: ${line}`));
 });
+
+test('ユースケースの「このツールならではの使い方」の値は計算部と同じ（日英）', () => {
+  const key = C.makeKey(20, C.DEFAULT_RESERVED, C.seededUint32Source('PORTA1563')).key;
+  const jupiter = C.encrypt(key, 'Jupiter was here', { dummy: 'Z', mode: 'replace' });
+  assert.equal(jupiter.output, '788 505 701 141 757 717 726 501');
+  const again = C.makeKey(20, C.DEFAULT_RESERVED, C.seededUint32Source('PORTA1563')).key;
+  assert.deepEqual(again.matrix, key.matrix);
+  const inin = C.encrypt(key, 'IN IN IN', { dummy: 'Z', mode: 'concat' });
+  assert.equal(inin.output, '441 441 441');
+  assert.deepEqual(inin.pairs, ['IN', 'IN', 'IN']);
+  const cells = key.matrix.flat();
+  assert.equal(cells.length, 400);
+  assert.equal(new Set(cells).size, 400);
+  for (const md of [readme, readmeEn]) {
+    assert.ok(md.includes('788 505 701 141 757 717 726 501'));
+    assert.ok(md.includes('441 441 441'));
+    assert.ok(md.includes('400'));
+  }
+});
